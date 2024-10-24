@@ -37,5 +37,9 @@ WHERE u.id IN (
 -- Nested Subquery
 
 -- Outer Join
+-- Show all users and any events they've created, including users who haven't created events
+SELECT u.u_name, e.location, e.e_time
+FROM c_user u
+LEFT OUTER JOIN c_event e ON u.id = e.post_id;
 
 -- Views

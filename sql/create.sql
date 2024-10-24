@@ -32,7 +32,8 @@ CREATE TABLE friend (
 CREATE TABLE climb_information (
     id INT PRIMARY KEY,
     c_name VARCHAR(30),
-    grade NUMERIC(3, 2),
+    c_description VARCHAR(100),
+    grade NUMERIC(3 , 2 ),
     location VARCHAR(30)
 );
 
@@ -47,16 +48,6 @@ CREATE TABLE climbed (
         REFERENCES climb_information (id)
 );
 
-CREATE TABLE c_event (
-    id INT PRIMARY KEY,
-    e_name VARCHAR(30),
-    location VARCHAR(30),
-    e_time VARCHAR(10),
-    created_by INT,
-    FOREIGN KEY (created_by)
-        REFERENCES c_user (id)
-);
-
 CREATE TABLE post (
     id INT PRIMARY KEY,
     title VARCHAR(20),
@@ -67,7 +58,36 @@ CREATE TABLE post (
         REFERENCES c_user (id)
 );
 
--- TODO: ADD LIKE AND SHARE FOR EVENT AND POST
+-- Event is a subtype of post, only one event per post
+CREATE TABLE c_event (
+    id INT PRIMARY KEY,
+    location VARCHAR(30),
+    e_time DATETIME,
+    post_id INT UNIQUE NOT NULL,
+    FOREIGN KEY (post_id)
+        REFERENCES post (id)
+);
+
+-- Making workout a subtype of post and just adding a big description instead of multivalued attribute
+CREATE TABLE workout (
+    id INT PRIMARY KEY,
+    w_name VARCHAR(30),
+    w_description VARCHAR(300),
+    post_id INT UNIQUE NOT NULL,
+    FOREIGN KEY (post_id)
+        REFERENCES post (id)
+);
+
+CREATE TABLE c_liked (
+    user_id INT,
+    post_id INT,
+    time_liked DATETIME,
+    PRIMARY KEY (user_id , post_id),
+    FOREIGN KEY (user_id)
+        REFERENCES c_user (id),
+    FOREIGN KEY (post_id)
+        REFERENCES post (id)
+);
 
 CREATE TABLE acheivement (
     a_name VARCHAR(30) PRIMARY KEY
@@ -83,12 +103,3 @@ CREATE TABLE has_acheivement (
     FOREIGN KEY (a_name)
         REFERENCES acheivement (a_name)
 );
-
--- TODO: ADD SOME RELATIONSHIP THAT LINKS GYM WITH USER/WORKOUTS
-CREATE TABLE gym (
-    id INT PRIMARY KEY,
-    g_name VARCHAR(30),
-    address VARCHAR(30)
-);
-
--- TODO: ADD WORKOUT/EXERCISE TABLE AND ADD COMPLETE RELATIONSHIP

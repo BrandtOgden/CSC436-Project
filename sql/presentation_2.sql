@@ -35,7 +35,6 @@ WHERE id IN (
 );
 
 
-
 -- Outer Join
 -- Show all users and any events they've created, including users who haven't created events
 SELECT u_name, location, e_time
@@ -45,10 +44,10 @@ LEFT OUTER JOIN c_event ON c_user.id = c_event.post_id;
 -- Views
 -- Create a view that shows all posts with their associated likes
 CREATE VIEW PostLikes AS
-SELECT p.title, p.p_description, COUNT(l.user_id) AS total_likes
-FROM post p
-LEFT JOIN c_liked l ON p.id = l.post_id
-GROUP BY p.title, p.p_description;
+SELECT title, COUNT(user_id) AS total_likes
+FROM post
+LEFT JOIN c_liked ON post.id = c_liked.post_id
+GROUP BY title;
 
 -- Index Example
 -- Create an index on the date_accepted column in the friend table for faster lookups

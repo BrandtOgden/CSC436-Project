@@ -48,3 +48,25 @@ SELECT p.title, p.p_description, COUNT(l.user_id) AS total_likes
 FROM post p
 LEFT JOIN c_liked l ON p.id = l.post_id
 GROUP BY p.title, p.p_description;
+
+-- Index Example
+-- Create an index on the date_accepted column in the friend table for faster lookups
+CREATE INDEX idx_friend_date ON friend(date_accepted);
+
+
+-- Check Constraint Example
+-- Ensure that users must be at least 18 years old when added to the database
+ALTER TABLE c_user
+ADD CONSTRAINT chk_user_age CHECK (age >= 18);
+
+-- Unique Constraint Example
+-- Enforce unique achievement names in the acheivement table
+ALTER TABLE acheivement
+ADD CONSTRAINT unique_acheivement_name UNIQUE (a_name);
+
+-- Trigger Example
+-- Automatically update post timestamps whenever the post is updated
+CREATE TRIGGER update_post_time
+BEFORE UPDATE ON post
+FOR EACH ROW
+SET NEW.updated_at = NOW();

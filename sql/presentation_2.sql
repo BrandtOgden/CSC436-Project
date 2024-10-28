@@ -6,19 +6,29 @@ All of the different queries we will show will be here
 -- Create (will be done in create.sql)
 
 -- Drop 
-DROP TABLE IF EXISTS has_acheivement;
+DROP TABLE IF EXISTS has_achievement;
 
 -- Alter
+select * from c_user;
+
 ALTER TABLE c_user 
 ADD email VARCHAR(50);
 
--- Insert (will be done in populate.sql)
-
 -- Delete
+select * from c_user;
+
+DELETE FROM c_user
+WHERE id = 3;
 
 -- Update
 
--- Select 
+select id,u_name, pronouns
+from c_user
+where id = 2;
+
+UPDATE c_user
+SET pronouns = 'they/them'
+WHERE id = 2;
 
 -- Special Queries
 
@@ -31,7 +41,7 @@ WHERE id IN (
     FROM c_liked
     JOIN post ON post_id = id
     JOIN c_user AS creator_user ON created_by = creator_user.id
-    WHERE age < 25
+    WHERE TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 25
 );
 
 
@@ -49,24 +59,25 @@ FROM post
 LEFT JOIN c_liked ON post.id = c_liked.post_id
 GROUP BY title;
 
+SELECT 
+    *
+FROM
+    PostLikes;
+
 -- Index Example
 -- Create an index on the date_accepted column in the friend table for faster lookups
 CREATE INDEX idx_friend_date ON friend(date_accepted);
 
 
 -- Check Constraint Example
--- Ensure that users must be at least 18 years old when added to the database
+-- Ensure that users abilities are one of 4 options
 ALTER TABLE c_user
-ADD CONSTRAINT chk_user_age CHECK (age >= 18);
+ADD CONSTRAINT chk_ability 
+CHECK (ability IN ('Beginner', 'Intermediate', 'Advanced', 'Expert'));
+
 
 -- Unique Constraint Example
 -- Enforce unique achievement names in the acheivement table
-ALTER TABLE acheivement
-ADD CONSTRAINT unique_acheivement_name UNIQUE (a_name);
+ALTER TABLE achievement
+ADD CONSTRAINT unique_achievement_name UNIQUE (a_name);
 
--- Trigger Example
--- Automatically update post timestamps whenever the post is updated
-CREATE TRIGGER update_post_time
-BEFORE UPDATE ON post
-FOR EACH ROW
-SET NEW.updated_at = NOW();

@@ -22,7 +22,7 @@ ADD email VARCHAR(50);
 
 -- Special Queries
 
--- Nested Subquery Example
+-- Nested Subquery
 -- Find users who liked posts created by users younger than 25
 SELECT u.u_name
 FROM c_user u
@@ -34,7 +34,6 @@ WHERE u.id IN (
     WHERE u2.age < 25
 );
 
--- Nested Subquery
 
 -- Outer Join
 -- Show all users and any events they've created, including users who haven't created events
@@ -43,3 +42,9 @@ FROM c_user u
 LEFT OUTER JOIN c_event e ON u.id = e.post_id;
 
 -- Views
+-- Create a view that shows all posts with their associated likes
+CREATE VIEW PostLikes AS
+SELECT p.title, p.p_description, COUNT(l.user_id) AS total_likes
+FROM post p
+LEFT JOIN c_liked l ON p.id = l.post_id
+GROUP BY p.title, p.p_description;

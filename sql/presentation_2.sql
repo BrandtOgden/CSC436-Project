@@ -38,9 +38,9 @@ WHERE id IN (
 
 -- Outer Join
 -- Show all users and any events they've created, including users who haven't created events
-SELECT u.u_name, e.location, e.e_time
-FROM c_user u
-LEFT OUTER JOIN c_event e ON u.id = e.post_id;
+SELECT u_name, location, e_time
+FROM c_user
+LEFT OUTER JOIN c_event ON c_user.id = c_event.post_id;
 
 -- Views
 -- Create a view that shows all posts with their associated likes

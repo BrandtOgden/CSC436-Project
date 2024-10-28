@@ -24,15 +24,16 @@ ADD email VARCHAR(50);
 
 -- Nested Subquery
 -- Find users who liked posts created by users younger than 25
-SELECT u.u_name
-FROM c_user u
-WHERE u.id IN (
-    SELECT l.user_id
-    FROM c_liked l
-    JOIN post p ON l.post_id = p.id
-    JOIN c_user u2 ON p.created_by = u2.id
-    WHERE u2.age < 25
+SELECT u_name
+FROM c_user
+WHERE id IN (
+    SELECT user_id
+    FROM c_liked
+    JOIN post ON post_id = id
+    JOIN c_user AS creator_user ON created_by = creator_user.id
+    WHERE age < 25
 );
+
 
 
 -- Outer Join

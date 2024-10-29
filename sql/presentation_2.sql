@@ -9,22 +9,24 @@ All of the different queries we will show will be here
 DROP TABLE IF EXISTS has_achievement;
 
 -- Alter
-select * from c_user;
+SELECT * FROM c_user;
 
 ALTER TABLE c_user 
 ADD email VARCHAR(50);
 
 -- Delete
-select * from c_user;
+SELECT * FROM c_user;
+SELECT * FROM post 
+WHERE created_by = 3;
 
 DELETE FROM c_user
 WHERE id = 3;
 
 -- Update
 
-select id,u_name, pronouns
-from c_user
-where id = 2;
+SELECT id,u_name, pronouns
+FROM c_user
+WHERE id = 2;
 
 UPDATE c_user
 SET pronouns = 'they/them'
@@ -39,8 +41,8 @@ FROM c_user
 WHERE id IN (
     SELECT user_id
     FROM c_liked
-    JOIN post ON post_id = id
-    JOIN c_user ON created_by = id
+    JOIN post ON post.id = user_id
+    JOIN c_user ON created_by = user_id
     WHERE TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 25
 );
 

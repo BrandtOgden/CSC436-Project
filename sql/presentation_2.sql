@@ -3,28 +3,27 @@ This file will be used for the second project presentation
 All of the different queries we will show will be here
 */
 
--- Create (will be done in create.sql)
-
 -- Drop 
 DROP TABLE IF EXISTS has_achievement;
 
 -- Alter
-select * from c_user;
+SELECT * FROM c_user;
 
 ALTER TABLE c_user 
 ADD email VARCHAR(50);
 
 -- Delete
-select * from c_user;
+SELECT * FROM c_user;
+SELECT * FROM post 
+WHERE created_by = 3;
 
 DELETE FROM c_user
 WHERE id = 3;
 
 -- Update
-
-select id,u_name, pronouns
-from c_user
-where id = 2;
+SELECT id,u_name, pronouns
+FROM c_user
+WHERE id = 2;
 
 UPDATE c_user
 SET pronouns = 'they/them'
@@ -42,9 +41,8 @@ FROM c_user
 WHERE id IN (
     SELECT user_id
     FROM c_liked
-    JOIN post ON post_id = id
-    JOIN c_user ON created_by = c_user.id
-    -- dot notation used because id is used as the same name in multiple tables
+    JOIN post ON post.id = user_id
+    JOIN c_user ON created_by = user_id
     WHERE TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 25
 );
 
@@ -81,22 +79,17 @@ FROM post
 LEFT JOIN c_liked ON post.id = .post_id
 GROUP BY title;
 
-SELECT 
-    *
-FROM
-    PostLikes;
+SELECT * FROM PostLikes;
 
 -- Index Example
 -- Create an index on the date_accepted column in the friend table for faster lookups
 CREATE INDEX idx_friend_date ON friend(date_accepted);
-
 
 -- Check Constraint Example
 -- Ensure that users abilities are one of 4 options
 ALTER TABLE c_user
 ADD CONSTRAINT chk_ability 
 CHECK (ability IN ('Beginner', 'Intermediate', 'Advanced', 'Expert'));
-
 
 -- Unique Constraint Example
 -- Enforce unique achievement names in the acheivement table

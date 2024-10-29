@@ -40,7 +40,7 @@ WHERE id IN (
     SELECT user_id
     FROM c_liked
     JOIN post ON post_id = id
-    JOIN c_user AS creator_user ON created_by = creator_user.id
+    JOIN c_user ON created_by = c_user.id
     WHERE TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 25
 );
 

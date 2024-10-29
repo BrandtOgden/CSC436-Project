@@ -33,23 +33,30 @@ WHERE id = 2;
 -- Special Queries
 
 -- Nested Subquery
--- Find users who liked posts created by users younger than 25
+-- Find users who liked posts created by users younger than 25. Dot notation used because id is ambigous
+-- This query pulls u_name from c_user where the id matches any user_id returned by the inner query. 
+-- (It’s looking for users whose id appears in the subset of user IDs satisfying the criteria in the inner query.)
+
 SELECT u_name
 FROM c_user
 WHERE id IN (
     SELECT user_id
     FROM c_liked
     JOIN post ON post_id = id
-    JOIN c_user ON created_by = id
+    JOIN c_user ON created_by = c_user.id
+    -- dot notation used because id is used as the same name in multiple tables
     WHERE TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 25
 );
 
 
 -- Outer Join
 -- Show all users and any events they've created, including users who haven't created events
+-- A LEFT OUTER JOIN means that all rows from the c_user table will be included in the result, even if there is no matching row in the c_event table.
+-- For rows where there is no match in c_event (i.e., no event associated with a particular user), the columns location and e_time from c_event will return NULL.
 SELECT u_name, location, e_time
 FROM c_user
-LEFT OUTER JOIN c_event ON c_user.id = c_event.post_id;
+-- dot notation used because id is used as the same name in multiple tables
+LEFT OUTER JOIN c_event ON c_user.id = post_id;
 
 -- Views
 -- Create a view that shows all posts with their associated likes

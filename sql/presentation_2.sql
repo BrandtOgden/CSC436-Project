@@ -3,8 +3,6 @@ This file will be used for the second project presentation
 All of the different queries we will show will be here
 */
 
--- Create (will be done in create.sql)
-
 -- Drop 
 DROP TABLE IF EXISTS has_achievement;
 
@@ -23,7 +21,6 @@ DELETE FROM c_user
 WHERE id = 3;
 
 -- Update
-
 SELECT id,u_name, pronouns
 FROM c_user
 WHERE id = 2;
@@ -61,22 +58,17 @@ FROM post
 LEFT JOIN c_liked ON post.id = c_liked.post_id
 GROUP BY title;
 
-SELECT 
-    *
-FROM
-    PostLikes;
+SELECT * FROM PostLikes;
 
 -- Index Example
 -- Create an index on the date_accepted column in the friend table for faster lookups
 CREATE INDEX idx_friend_date ON friend(date_accepted);
-
 
 -- Check Constraint Example
 -- Ensure that users abilities are one of 4 options
 ALTER TABLE c_user
 ADD CONSTRAINT chk_ability 
 CHECK (ability IN ('Beginner', 'Intermediate', 'Advanced', 'Expert'));
-
 
 -- Unique Constraint Example
 -- Enforce unique achievement names in the acheivement table

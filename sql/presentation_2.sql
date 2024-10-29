@@ -61,9 +61,24 @@ LEFT OUTER JOIN c_event ON c_user.id = post_id;
 -- Views
 -- Create a view that shows all posts with their associated likes
 CREATE VIEW PostLikes AS
-SELECT title, COUNT(user_id) AS total_likes
+SELECT title, COUNT(user_id)
 FROM post
-LEFT JOIN c_liked ON post.id = c_liked.post_id
+LEFT JOIN c_liked ON post.id = post_id
+GROUP BY title;
+
+SELECT 
+    *
+FROM
+    PostLikes;
+
+-- delete the view
+DROP VIEW PostLikes;
+
+--add column name
+CREATE VIEW PostLikes AS
+SELECT title, COUNT(user_id) as Total_Likes
+FROM post
+LEFT JOIN c_liked ON post.id = .post_id
 GROUP BY title;
 
 SELECT 

@@ -32,7 +32,10 @@ WHERE id = 2;
 -- Special Queries
 
 -- Nested Subquery
--- Find users who liked posts created by users younger than 25
+-- Find users who liked posts created by users younger than 25. Dot notation used because id is ambigous
+-- This query pulls u_name from c_user where the id matches any user_id returned by the inner query. 
+-- (It’s looking for users whose id appears in the subset of user IDs satisfying the criteria in the inner query.)
+
 SELECT u_name
 FROM c_user
 WHERE id IN (
@@ -46,16 +49,34 @@ WHERE id IN (
 
 -- Outer Join
 -- Show all users and any events they've created, including users who haven't created events
+-- A LEFT OUTER JOIN means that all rows from the c_user table will be included in the result, even if there is no matching row in the c_event table.
+-- For rows where there is no match in c_event (i.e., no event associated with a particular user), the columns location and e_time from c_event will return NULL.
 SELECT u_name, location, e_time
 FROM c_user
-LEFT OUTER JOIN c_event ON c_user.id = c_event.post_id;
+-- dot notation used because id is used as the same name in multiple tables
+LEFT OUTER JOIN c_event ON c_user.id = post_id;
 
 -- Views
 -- Create a view that shows all posts with their associated likes
 CREATE VIEW PostLikes AS
-SELECT title, COUNT(user_id) AS total_likes
+SELECT title, COUNT(user_id)
 FROM post
-LEFT JOIN c_liked ON post.id = c_liked.post_id
+LEFT JOIN c_liked ON post.id = post_id
+GROUP BY title;
+
+SELECT 
+    *
+FROM
+    PostLikes;
+
+-- delete the view
+DROP VIEW PostLikes;
+
+--add column name
+CREATE VIEW PostLikes AS
+SELECT title, COUNT(user_id) as Total_Likes
+FROM post
+LEFT JOIN c_liked ON post.id = .post_id
 GROUP BY title;
 
 SELECT * FROM PostLikes;

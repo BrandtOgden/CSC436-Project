@@ -5,7 +5,7 @@ routes = Blueprint('routes', __name__)
 
 @routes.route("/")
 def default():
-    return jsonify("This is the Flask API")
+    return jsonify("Welcome to the Flask API")
 
 
 @routes.route("/users", methods=["GET"])

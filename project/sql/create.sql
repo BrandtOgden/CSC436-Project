@@ -8,10 +8,14 @@ This file creates the database from scratch
 CREATE DATABASE Climbing;
 USE Climbing;
 
+-- User that Flask uses to connect to database
+CREATE USER 'flask'@'%' IDENTIFIED BY 'Fl@5kFl@5k!';
+GRANT SELECT ON Climbing.* TO 'flask'@'%';
+FLUSH PRIVILEGES;
+
 CREATE TABLE c_user (
     id INT PRIMARY KEY AUTO_INCREMENT,
     u_name VARCHAR(20),
-    age INT,
     pronouns VARCHAR(20),
     ability VARCHAR(20),
     date_of_birth CHAR(10)

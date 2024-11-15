@@ -1,9 +1,26 @@
 # CSC436-Project
 This repository holds our CSC 436 Database Management Systems final project
 
-# Getting started with Flask and React
-There's probably some dependencies that I'm leaving out.
-To get started you need to start the Flask API and then the React frontend Navigate to `flask` directory and run `python3 app.py`. On a separate terminal navigate to `react-app` directory and rum `npm start`, and you should see a very basic HTML frontend that has the output from the database. You will need my .env file that has the password for the Flask user in the database. DON'T ADD THIS TO THE REPO!
+# Getting Started
+
+## Prerequisites
+This project require the following software to be installed:
+- **Node.js**: Version 18.x or higher is recommended, see [Node.js Official Website](https://nodejs.org/en)
+- **npm**: Bundled with Node.js
+
+To verify installation run:
+```
+node -v
+npm -v
+```
+
+## Dependencies
+To install the Flask dependencies used for this project, from the `flask` directory run `pip install -r requirements.txt`.
+
+To install React dependencies navigate to the `react-app` directory and run `npm install`.
+
+## Running The App
+To get started you need to start the Flask API and then the React frontend navigate to `flask` directory and run `python3 run.py`. On a separate terminal navigate to `react-app` directory and rum `npm start`, and you should see a very basic HTML frontend that has the output from the database. You will need my .env file that has the password for the Flask user in the database. DON'T ADD THIS TO THE REPO!
 
 
 # This is all boilerplate create-react-app stuff that can probably be removed

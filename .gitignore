@@ -1,0 +1,17 @@
+# Environment files (VERY IMPORTANT)
+*.env
+
+# Node modules (React)
+node_modules/
+
+# Might want to add build output (React)
+
+# Python bytecode and cache files (Flask)
+*.pyc
+__pycache__/
+
+# IDE specific 
+.vscode/
+
+# MAC system files
+.DS_Store

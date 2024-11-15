@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load database credentials from .env
-load_dotenv("sql.env")
+load_dotenv("aws_rds.env")
 
 @app.route("/test")
 def fetch_data():

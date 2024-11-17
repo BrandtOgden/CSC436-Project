@@ -1,24 +1,25 @@
 from flask import Flask, g
 from flask_cors import CORS
-from dotenv import load_dotenv
 import mysql.connector
 import os
+from .config import Config
 
-# Get environment variables from .env
-load_dotenv()
 
 def connect_db():
     """
     Connects to an arbitrary database using credentials found in .env file
     This connects to the database only for the current API call to adhere to REST
+    Times out after 10 seconds so I don't forget that 
     """
     if 'db' not in g:
+        connection = None
         try:
             connection = mysql.connector.connect(
                 host=os.getenv('DB_HOST'),
                 user=os.getenv('DB_USER'),
                 password=os.getenv('DB_PASSWORD'),
-                database=os.getenv('DB_NAME')
+                database=os.getenv('DB_NAME'),
+                connect_timeout=10
             )
         except mysql.connector.Error as e:
             print(f"Error connecting to database: {e}")
@@ -46,11 +47,11 @@ def create_app():
     Registers routes defined in routes.py
     """
     app = Flask(__name__)
-    CORS(app)
+    CORS(app) # Make this better in production
 
+    app.config.from_object(Config)
     app.teardown_appcontext(disconnect_db)
 
-    # Import and register blueprints
     from .routes import routes
     app.register_blueprint(routes)
 

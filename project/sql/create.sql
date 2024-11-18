@@ -10,7 +10,7 @@ USE Climbing;
 
 -- User that Flask uses to connect to database
 CREATE USER 'flask'@'%' IDENTIFIED BY 'Fl@5kFl@5k!';
-GRANT SELECT ON Climbing.* TO 'flask'@'%';
+GRANT SELECT, INSERT, DELETE ON Climbing.* TO 'flask'@'%';
 FLUSH PRIVILEGES;
 
 CREATE TABLE c_user (
@@ -118,3 +118,10 @@ CREATE TABLE has_achievement (
         REFERENCES achievement (a_name)
         ON DELETE CASCADE
 );
+
+-- Add password_hash value to c_user, length from bcrypt will alwasy be 60
+-- All other users that we populated the database with will ahve 
+ALTER TABLE c_user
+ADD COLUMN password_hash CHAR(60) DEFAULT NULL;
+
+

@@ -1,5 +1,6 @@
 from flask import Flask, g
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 import mysql.connector
 import os
 from .config import Config
@@ -41,6 +42,7 @@ def disconnect_db(exception=None):
         db.close()
 
 
+bcrypt = Bcrypt()
 def create_app():
     """
     Initial setup for Flask app. Uses CORS to allow React and Flask to be on different domains
@@ -48,11 +50,14 @@ def create_app():
     """
     app = Flask(__name__)
     CORS(app) # Make this better in production
+    bcrypt.init_app(app)
 
     app.config.from_object(Config)
     app.teardown_appcontext(disconnect_db)
 
     from .routes import routes
+    from .auth import auth
     app.register_blueprint(routes)
+    app.register_blueprint(auth)
 
     return app

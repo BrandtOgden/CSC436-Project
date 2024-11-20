@@ -1,15 +1,11 @@
 import React from "react";
-import {
-  Box,
-  Flex,
-  Text,
-  Icon,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Box, Flex, Text, Icon, useColorModeValue } from "@chakra-ui/react";
 import { MdHome, MdSettings } from "react-icons/md";
-import { Link } from "react-router-dom";
+import Home from "../pages/Home";
+import Settings from "../pages/Settings";
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const NavItem = ({ icon, label, to }) => (
     <Link to={to}>
       <Flex
@@ -43,7 +39,11 @@ const Layout = ({ children }) => {
         <NavItem icon={MdSettings} label="Settings" to="/settings" />
       </Box>
       <Box flex="1" p="6" bg={useColorModeValue("white", "gray.900")}>
-        {children}
+        {/* Nested routes for Home and Settings */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
       </Box>
     </Box>
   );

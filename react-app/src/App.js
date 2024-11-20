@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 
 const App = () => {
+    {/* Fetch data from Flask API
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,23 +28,21 @@ const App = () => {
         setLoading(false);  // Set loading to false in case of error
       });
   }, []);
-
+*/}
   return (
-    <div>
-      <h1>Data from MySQL</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {data.map((row, index) => (
-            <li key={index}>
-              {/* Display data from each row */}
-              {JSON.stringify(row)} 
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Home />
+            </Layout>
+          }
+        />
+      </Routes>
+    </Router>
   );
 };
 

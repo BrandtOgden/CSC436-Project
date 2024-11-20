@@ -9,7 +9,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
-          path="/*" // Use "/*" for nested routes within Layout
+          path="/*" 
           element={<Layout />}
         />
       </Routes>

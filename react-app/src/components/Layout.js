@@ -39,7 +39,7 @@ const Layout = () => {
         <NavItem icon={MdSettings} label="Settings" to="/settings" />
       </Box>
       <Box flex="1" p="6" bg={useColorModeValue("white", "gray.900")}>
-        {/* Nested routes for Home and Settings */}
+        {/*  routes for Home and Settings */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/settings" element={<Settings />} />

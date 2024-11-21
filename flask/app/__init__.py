@@ -48,7 +48,7 @@ def create_app():
     Initial setup for Flask app. Uses CORS to allow React and Flask to be on different domains
     Registers routes defined in routes.py
     """
-    app = Flask('Climbing App API')
+    app = Flask(__name__)
 
     app.config.from_object(Config)
     app.teardown_appcontext(disconnect_db)

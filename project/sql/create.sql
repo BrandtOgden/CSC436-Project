@@ -9,13 +9,13 @@ CREATE DATABASE Climbing;
 USE Climbing;
 
 -- User that Flask uses to connect to database
-CREATE USER 'flask'@'%' IDENTIFIED BY 'Fl@5kFl@5k!';
+-- CREATE USER 'flask'@'%' IDENTIFIED BY 'Fl@5kFl@5k!';
 GRANT SELECT, INSERT, DELETE ON Climbing.* TO 'flask'@'%';
 FLUSH PRIVILEGES;
 
 CREATE TABLE c_user (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    u_name VARCHAR(20),
+    username VARCHAR(20),
     pronouns VARCHAR(20),
     ability VARCHAR(20),
     date_of_birth CHAR(10)
@@ -60,8 +60,9 @@ CREATE TABLE post (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(40),
     p_description VARCHAR(100),
-    picture_url VARCHAR(100),
+    image_url VARCHAR(100),
     created_by INT,
+    date_created DATETIME,
     FOREIGN KEY (created_by)
         REFERENCES c_user (id)
         ON DELETE CASCADE
@@ -118,12 +119,4 @@ CREATE TABLE has_achievement (
         REFERENCES achievement (a_name)
         ON DELETE CASCADE
 );
-
--- Add password_hash value to c_user, length from bcrypt will always be 60
--- All other users that we populated the database with will have NULL 
-ALTER TABLE c_user
-ADD COLUMN password_hash CHAR(60) DEFAULT NULL;
-
-ALTER TABLE post
-ADD COLUMN date_create DATETIME;
 

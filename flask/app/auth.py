@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
+from flask_jwt_extended import create_access_token
 from . import connect_db, bcrypt
 
 auth = Blueprint('auth', __name__)
@@ -27,13 +28,13 @@ def signup():
     Return HTTP Codes:
         200: Signup Success
         400: Bad Request - there's something wrong with the request from the frontend
-        500: Internal Server Error - Some logic within this function is wrong (most likely a SQL error)
+        500: Internal Server Error - Some logic within this function is wrong (most likely a SQL/database error)
     """
     data = request.get_json()
 
     val_list = ['username', 'password', 'pronouns', 'ability', 'dob']
     if not data:
-        abort(400, description=f"Variables required: {val_list}")
+        abort(400, description=f"No body. Variables required: {val_list}")
 
     for key in val_list:
         if key not in data:
@@ -50,13 +51,21 @@ def signup():
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     cursor = connect_db().cursor()
-    # TODO: Eventually going to want to make sure username is unique or have some way to enforce this
-    cursor.execute("INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \
-                   VALUES (%s, %s, %s, %s, %s)", (username, pronouns, ability, dob, password_hash))
-    cursor._connection.commit()
-    cursor.close()
 
-    return jsonify({"message": "Signup Success"})
+    try:
+        cursor.execute("INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \
+                    VALUES (%s, %s, %s, %s, %s)", (username, pronouns, ability, dob, password_hash))
+        cursor._connection.commit()
+
+        # Get the id from the newly created user
+        user_id = cursor.lastrowid
+
+        # Now generate JWT
+        # FIXME: Going to want to make this username and make username the primary key of the table
+        token = create_access_token(identity=user_id)
+        return jsonify({"jwt": token}), 200
+    except Exception as e:
+        abort(500, description=f"Database Error: {e}")
 
 
 @auth.route('/login', methods=['POST'])
@@ -67,7 +76,7 @@ def login():
         200: Login Success
         400: Bad Request - there's something wrong with the request from the frontend
         401: Unauthorized - Invalid user credentials
-        500: Internal Server Error - Some logic within this function is wrong (most likely a SQL error)
+        500: Internal Server Error - Some logic within this function is wrong (most likely a SQL/database error)
     """
     data = request.get_json()
 
@@ -78,12 +87,18 @@ def login():
     password = data.get('password')
 
     cursor = connect_db().cursor()
-    cursor.execute("SELECT password_hash FROM c_user WHERE u_name = %s", (username,))
-    user = cursor.fetchone()
+    cursor.execute("SELECT id, password_hash FROM c_user WHERE u_name = %s", (username,))
+    db_response = cursor.fetchone()
     cursor.close()
 
-    if user:
-        if bcrypt.check_password_hash(user[0], password):
-            return jsonify({"message": "Login Success"})
+    if db_response is None:
+        abort(401, description="Invalid username")
+
+    user_id = db_response[0]
+    password_hash = db_response[1]
+
+    if bcrypt.check_password_hash(password_hash, password):
+        token = create_access_token(identity=user_id)
+        return jsonify({"jwt": token}), 200
         
-    abort(401, description="Invalid username or password")
+    abort(401, description="Invalid password")

@@ -15,7 +15,7 @@ Probably going to want to use ChatGPT to generate this data in some form
 -- SELECT * FROM event_details;
 
 -- Populating the c_user table with users
-INSERT INTO c_user (u_name, pronouns, ability, date_of_birth) VALUES
+INSERT INTO c_user (username, pronouns, ability, date_of_birth) VALUES
 ('Alex Smith', 'they/them', 'Intermediate', '1999-08-15'),
 ('Jamie Lee', 'she/her', 'Advanced', '1995-05-20'),
 ('Chris Tan', 'he/him', 'Beginner', '2002-03-11'),
@@ -67,6 +67,10 @@ INSERT INTO c_user (u_name, pronouns, ability, date_of_birth) VALUES
 ('Blake Fox', 'she/her', 'Expert', '1995-01-29'),
 ('Jordan Foster', 'they/them', 'Intermediate', '1997-05-25');
 
+-- Add password_hash value to c_user, length from bcrypt will always be 60
+-- All other users that we populated the database with will have NULL 
+ALTER TABLE c_user
+ADD COLUMN password_hash CHAR(60) DEFAULT NULL;
 
 -- Populating the achievement table with some achievements
 INSERT INTO achievement (a_name) VALUES
@@ -90,17 +94,23 @@ INSERT INTO climb_information (id, c_name, c_description, grade, location) VALUE
 (8, 'Overhang Odyssey', 'Steep climb with powerful moves.', 5.13, 'Peak Performance');
 
 -- Populating the post table with some fake posts
-INSERT INTO post (id, title, p_description, picture_url, created_by) VALUES
-(1, 'Climbing Techniques', 'A guide to getting started with climbing techniques.', 'https://example.com/image1.jpg', 1),
-(2, 'Advanced Bouldering', 'Tips for advanced climbers to improve their bouldering skills.', 'https://example.com/image2.jpg', 2),
-(3, 'Beginner’s Guide', 'Everything a beginner climber needs to know.', 'https://example.com/image3.jpg', 3),
-(4, 'Nutrition for Climbers', 'How to fuel your body for the best performance.', 'https://example.com/image4.jpg', 4),
-(5, 'Mental Toughness', 'Building the mindset to overcome climbing challenges.', 'https://example.com/image5.jpg', 5),
-(6, 'Gear Essentials', 'Must-have gear for climbing safely.', 'https://example.com/image6.jpg', 6),
-(7, 'Training for Endurance', 'A workout plan to build climbing endurance.', 'https://example.com/image7.jpg', 7),
-(8, 'Finding Climbing Routes', 'Tips on finding the best outdoor routes.', 'https://example.com/image8.jpg', 8),
-(9, 'How to Overcome Fear of Heights', 'Mental tips for overcoming fear.', 'https://example.com/image9.jpg', 9),
-(10, 'Strength Training for Climbers', 'Exercises to build power for climbing.', 'https://example.com/image10.jpg', 10);
+INSERT INTO post (id, title, p_description, image_url, created_by, date_created) VALUES
+(1, 'Climbing Techniques', 'A guide to getting started with climbing techniques.', 'image/image_1', 1, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(2, 'Advanced Bouldering', 'Tips for advanced climbers to improve their bouldering skills.', 'image/image_2', 2, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(3, 'Beginner’s Guide', 'Everything a beginner climber needs to know.', 'image/image_3', 3, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(4, 'Nutrition for Climbers', 'How to fuel your body for the best performance.', 'image/image_4', 4, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(5, 'Mental Toughness', 'Building the mindset to overcome climbing challenges.', 'image/image_5', 5, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(6, 'Gear Essentials', 'Must-have gear for climbing safely.', 'image/image_6', 6, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(7, 'Training for Endurance', 'A workout plan to build climbing endurance.', 'image/image_7', 7, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(8, 'Finding Climbing Routes', 'Tips on finding the best outdoor routes.', 'image/image_8', 8, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(9, 'How to Overcome Fear of Heights', 'Mental tips for overcoming fear.', 'image/image_9', 9, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(10, 'Strength Training for Climbers', 'Exercises to build power for climbing.', 'image/image_10', 10, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(11, 'Crack Climbing Basics', 'Master the art of crack climbing.', 'image/image_11', 11, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(12, 'Top Rope Climbing Tips', 'A complete guide to top rope climbing.', 'image/image_12', 12, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(13, 'Climbing Safety Tips', 'Learn how to climb safely and avoid injuries.', 'image/image_13', 13, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(14, 'Best Indoor Gyms', 'Find the best climbing gyms near you.', 'image/image_14', 14, NOW() - INTERVAL FLOOR(RAND() * 5) DAY),
+(15, 'How to Grip Holds Better', 'Improve your grip and climbing technique.', 'image/image_15', 15, NOW() - INTERVAL FLOOR(RAND() * 5) DAY);
+
 
 -- Populating the c_event table with some events based on posts
 INSERT INTO c_event (id, location, e_time, post_id) VALUES

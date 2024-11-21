@@ -1,6 +1,7 @@
 from flask import Flask, g
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
 import mysql.connector
 import os
 from .config import Config
@@ -49,11 +50,13 @@ def create_app():
     Registers routes defined in routes.py
     """
     app = Flask(__name__)
-    CORS(app) # Make this better in production
-    bcrypt.init_app(app)
 
     app.config.from_object(Config)
     app.teardown_appcontext(disconnect_db)
+
+    CORS(app) # Make this better in production
+    bcrypt.init_app(app)
+    jwt = JWTManager(app)
 
     from .routes import routes
     from .auth import auth

@@ -36,7 +36,7 @@ const Settings = () => {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get("/api/profile");
+      const { data } = await axios.get("http://localhost:3000/api/profile");
       setPersonalInfo(data);
       setLoading(false);
     } catch (error) {
@@ -66,7 +66,7 @@ const Settings = () => {
   const saveChanges = async () => {
     setLoading(true);
     try {
-      await axios.put("/api/profile", personalInfo);
+      await axios.put("http://localhost:3000/api/profile", personalInfo);
       setEditMode(false);
       toast({
         title: "Profile updated",
@@ -91,7 +91,7 @@ const Settings = () => {
   const deleteProfile = async () => {
     setLoading(true);
     try {
-      await axios.delete("/api/profile");
+      await axios.delete("http://localhost:3000/api/profile");
       toast({
         title: "Profile deleted",
         description: "Your profile has been deleted successfully.",

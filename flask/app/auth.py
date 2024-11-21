@@ -4,23 +4,6 @@ from . import connect_db, bcrypt
 
 auth = Blueprint('auth', __name__)
 
-@auth.errorhandler(400)
-def handle_bad_request(error):
-    """
-    Handles 400 HTTP Error - Bad Request
-    Used for when there is something wrong with the format of the JSON from the frontend
-    """
-    return jsonify({'error': 'Bad Request', 'message': error.description}), 400
-
-@auth.errorhandler(401)
-def handle_unauthorized_user(error):
-    """
-    Handles 401 HTTP Error - Unauthorized
-    Used for when the user provided credentials don't match anything in the database
-    """
-    return jsonify({'error': 'Unauthorized', 'message': error.description}), 401
-
-
 @auth.route('/signup', methods=['POST'])
 def signup():
     """
@@ -51,6 +34,10 @@ def signup():
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     cursor = connect_db().cursor()
+    cursor.execute("INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \
+                   VALUES (%s, %s, %s, %s, %s)", (username, pronouns, ability, dob, password_hash))
+    cursor._connection.commit()
+    cursor.close()
 
     try:
         cursor.execute("INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \

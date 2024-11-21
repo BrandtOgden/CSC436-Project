@@ -119,9 +119,11 @@ CREATE TABLE has_achievement (
         ON DELETE CASCADE
 );
 
--- Add password_hash value to c_user, length from bcrypt will alwasy be 60
--- All other users that we populated the database with will ahve 
+-- Add password_hash value to c_user, length from bcrypt will always be 60
+-- All other users that we populated the database with will have NULL 
 ALTER TABLE c_user
 ADD COLUMN password_hash CHAR(60) DEFAULT NULL;
 
+ALTER TABLE post
+ADD COLUMN date_create DATETIME;
 

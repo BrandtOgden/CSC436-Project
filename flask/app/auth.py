@@ -8,10 +8,6 @@ auth = Blueprint('auth', __name__)
 def signup():
     """
     Creates new user in database
-    Return HTTP Codes:
-        200: Signup Success
-        400: Bad Request - there's something wrong with the request from the frontend
-        500: Internal Server Error - Some logic within this function is wrong (most likely a SQL/database error)
     """
     data = request.get_json()
 
@@ -29,63 +25,63 @@ def signup():
     ability = data.get('ability')
     dob = data.get('dob')
 
-    print(username)
 
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    cursor = connect_db().cursor()
-    cursor.execute("INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \
-                   VALUES (%s, %s, %s, %s, %s)", (username, pronouns, ability, dob, password_hash))
-    cursor._connection.commit()
-    cursor.close()
-
     try:
-        cursor.execute("INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \
-                    VALUES (%s, %s, %s, %s, %s)", (username, pronouns, ability, dob, password_hash))
+        cursor = connect_db().cursor()
+        cursor.execute(
+            "INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \
+            VALUES (%s, %s, %s, %s, %s)",
+            (username, pronouns, ability, dob, password_hash)
+        )
         cursor._connection.commit()
 
-        # Get the id from the newly created user
+        # Get the ID of the newly created user
         user_id = cursor.lastrowid
+        cursor.close()
 
-        # Now generate JWT
-        # FIXME: Going to want to make this username and make username the primary key of the table
+        # Generate JWT
         token = create_access_token(identity=user_id)
         return jsonify({"jwt": token}), 200
     except Exception as e:
         abort(500, description=f"Database Error: {e}")
 
-
 @auth.route('/login', methods=['POST'])
 def login():
     """
     Checks if user is in database
-    Return HTTP Codes:
-        200: Login Success
-        400: Bad Request - there's something wrong with the request from the frontend
-        401: Unauthorized - Invalid user credentials
-        500: Internal Server Error - Some logic within this function is wrong (most likely a SQL/database error)
     """
     data = request.get_json()
 
     if not data or 'username' not in data or 'password' not in data:
-        abort(400, description="username and password are required")
+        abort(400, description="Username and password are required")
 
     username = data.get('username')
     password = data.get('password')
+    try:
+        cursor = connect_db().cursor(dictionary=True)
+        cursor.execute("SELECT id, password_hash FROM c_user WHERE u_name = %s LIMIT 1", (username,))
+        db_response = cursor.fetchone()
 
-    cursor = connect_db().cursor()
-    cursor.execute("SELECT id, password_hash FROM c_user WHERE u_name = %s", (username,))
-    db_response = cursor.fetchone()
-    cursor.close()
+        # Close cursor safely
+        try:
+            cursor.close()
+            print("Db closed")
+        except Exception as e:
+            print(f"Error closing the cursor: {e}")
 
-    if db_response is None:
-        abort(401, description="Invalid username")
+        if not db_response:
+            abort(401, description="Invalid username")
 
-    user_id = db_response[0]
-    password_hash = db_response[1]
+        user_id = db_response['id']
+        password_hash = db_response['password_hash']
 
-    if bcrypt.check_password_hash(password_hash, password):
-        token = create_access_token(identity=user_id)
-        return jsonify({"jwt": token}), 200
-        
-    abort(401, description="Invalid password")
+        if bcrypt.check_password_hash(password_hash, password):
+            token = create_access_token(identity=user_id)
+            return jsonify({"jwt": token}), 200
+        else:
+            abort(401, description="Invalid password")
+    except Exception as e:
+        print(f"Error in login: {e}")
+        abort(500, description=f"Internal Server Error: {e}")

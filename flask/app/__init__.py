@@ -6,6 +6,18 @@ import mysql.connector
 import os
 from .config import Config
 
+import logging
+
+# Configure logging to show debug messages
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 def connect_db():
     """
@@ -15,6 +27,7 @@ def connect_db():
     Return:
         Either database connection object or aborts with HTTP return code 500
     """
+    logger.debug("Connecting to AWS MySQL database")
     if 'db' not in g:
         connection = None
         try:
@@ -25,7 +38,9 @@ def connect_db():
                 database=os.getenv('DB_NAME'),
                 connect_timeout=10
             )
+            logger.debug("Connected to AWS MySQL database")
         except mysql.connector.Error as e:
+            logger.error(f"Error connecting to AWS MySQL database: {e}")
             print(e)
             abort(500, description=f"Error connecting to AWS MySQL database: {e}")
 

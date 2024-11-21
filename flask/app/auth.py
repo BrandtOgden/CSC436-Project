@@ -31,7 +31,7 @@ def signup():
     try:
         cursor = connect_db().cursor()
         cursor.execute(
-            "INSERT INTO c_user (u_name, pronouns, ability, date_of_birth, password_hash) \
+            "INSERT INTO c_user (username, pronouns, ability, date_of_birth, password_hash) \
             VALUES (%s, %s, %s, %s, %s)",
             (username, pronouns, ability, dob, password_hash)
         )
@@ -47,6 +47,7 @@ def signup():
     except Exception as e:
         abort(500, description=f"Database Error: {e}")
 
+
 @auth.route('/login', methods=['POST'])
 def login():
     """
@@ -55,33 +56,25 @@ def login():
     data = request.get_json()
 
     if not data or 'username' not in data or 'password' not in data:
+        print("outside")
         abort(400, description="Username and password are required")
 
     username = data.get('username')
     password = data.get('password')
-    try:
-        cursor = connect_db().cursor(dictionary=True)
-        cursor.execute("SELECT id, password_hash FROM c_user WHERE u_name = %s LIMIT 1", (username,))
-        db_response = cursor.fetchone()
+       
+    cursor = connect_db().cursor(dictionary=True)
+    cursor.execute("SELECT id, password_hash FROM c_user WHERE username = %s LIMIT 1", (username,))
+    db_response = cursor.fetchone()
+    cursor.close()
 
-        # Close cursor safely
-        try:
-            cursor.close()
-            print("Db closed")
-        except Exception as e:
-            print(f"Error closing the cursor: {e}")
+    if not db_response:
+        abort(401, description="Invalid username")
 
-        if not db_response:
-            abort(401, description="Invalid username")
+    user_id = db_response['id']
+    password_hash = db_response['password_hash']
 
-        user_id = db_response['id']
-        password_hash = db_response['password_hash']
-
-        if bcrypt.check_password_hash(password_hash, password):
-            token = create_access_token(identity=user_id)
-            return jsonify({"jwt": token}), 200
-        else:
-            abort(401, description="Invalid password")
-    except Exception as e:
-        print(f"Error in login: {e}")
-        abort(500, description=f"Internal Server Error: {e}")
+    if bcrypt.check_password_hash(password_hash, password):
+        token = create_access_token(identity=user_id)
+        return jsonify({"jwt": token}), 200
+    else:
+        abort(401, description="Invalid password")

@@ -2,9 +2,9 @@ import React from "react";
 import { Outlet, Routes, Route, Link } from "react-router-dom";
 import { Box, Flex, Text, Icon, useColorModeValue } from "@chakra-ui/react";
 import { MdHome, MdSettings, MdMenu } from "react-icons/md";
-import Home from "../pages/Home";
-import Settings from "../pages/Settings";
-import Profile from "../pages/Profile";
+import Home from "../pages/home";
+import Settings from "../pages/settings";
+import Profile from "../pages/profile";
 
 const Layout = () => {
   const NavItem = ({ icon, label, to }) => (

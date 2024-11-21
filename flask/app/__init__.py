@@ -1,11 +1,11 @@
-from flask import Flask, g, abort
+from flask import Flask, current_app, g, abort
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 import mysql.connector
 import os
 from .config import Config
-
+from .error_handler import register_error_handlers
 
 def connect_db():
     """
@@ -15,6 +15,7 @@ def connect_db():
     Return:
         Either database connection object or aborts with HTTP return code 500
     """
+    current_app.logger.info("Connecting to AWS MySQL database")
     if 'db' not in g:
         connection = None
         try:
@@ -25,7 +26,9 @@ def connect_db():
                 database=os.getenv('DB_NAME'),
                 connect_timeout=10
             )
+            current_app.logger.info("Connected to AWS MySQL database")
         except mysql.connector.Error as e:
+            current_app.logger.info(f"Error connecting to AWS MySQL database: {e}")
             print(e)
             abort(500, description=f"Error connecting to AWS MySQL database: {e}")
 
@@ -39,29 +42,33 @@ def disconnect_db(exception=None):
     """
     db = g.pop('db', None)
     if db is not None:
+        current_app.logger.info("Disconnecting from AWS MySQL database")
         db.close()
 
 
-bcrypt = Bcrypt()
 def create_app():
     """
     Initial setup for Flask app. Uses CORS to allow React and Flask to be on different domains
     Registers routes defined in routes.py
     """
+    # These are global variables that are needed elsewhere
+    # FIXME: Not sure if this needs to be global
+    global bcrypt
+    
     app = Flask(__name__)
 
     app.config.from_object(Config)
     app.teardown_appcontext(disconnect_db)
 
-    CORS(app) # Make this better in production
-    bcrypt.init_app(app)
+    CORS(app) # FIXME: Make this better in production
+    bcrypt = Bcrypt(app)
     jwt = JWTManager(app)
 
     from .routes import routes
     from .auth import auth
-    from .routes import routes
     app.register_blueprint(auth)
     app.register_blueprint(routes)
-    
+
+    register_error_handlers(app)
 
     return app

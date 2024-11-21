@@ -1,5 +1,4 @@
 from flask import jsonify
-# from . import auth, routes
 
 def register_error_handlers(app):
     @app.errorhandler(400)

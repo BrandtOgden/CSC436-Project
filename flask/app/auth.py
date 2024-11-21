@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, current_app
 from flask_jwt_extended import create_access_token
-from . import connect_db, bcrypt
+from .database_connection import connect_db 
 
 auth = Blueprint('auth', __name__)
 
@@ -25,7 +25,7 @@ def signup():
     ability = data.get('ability')
     dob = data.get('dob')
 
-    password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    password_hash = current_app.bcrypt.generate_password_hash(password).decode('utf-8')
 
     try:
         cursor = connect_db().cursor()
@@ -73,7 +73,7 @@ def login():
     user_id = db_response['id']
     password_hash = db_response['password_hash']
 
-    if bcrypt.check_password_hash(password_hash, password):
+    if current_app.bcrypt.check_password_hash(password_hash, password):
         token = create_access_token(identity=user_id)
         return jsonify({"jwt": token}), 200
     else:

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import connect_db
+from .database_connection import connect_db
 
 routes = Blueprint('routes', __name__)
 
@@ -28,8 +28,7 @@ def get_users():
 @jwt_required(optional=True)
 def get_posts():
     """
-    Returns 10 most recent posts
-    TODO: Could possibly do some custom recommendation
+    Returns 10 most recent posts using recent_posts view
     """
     cursor = connect_db().cursor(dictionary=True)
     cursor.execute('SELECT * FROM recent_posts') 

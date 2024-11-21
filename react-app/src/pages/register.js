@@ -10,22 +10,27 @@ import {
   Heading,
   Text,
   useColorModeValue,
+  Select,
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [pronouns, setPronouns] = useState("");
+  const [ability, setAbility] = useState("");
+  const [dob, setDob] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     // Basic validation
-    if (!username || !password || !confirmPassword) {
+    if (!username || !password || !confirmPassword || !pronouns || !ability || !dob) {
       setError("All fields are required.");
       return;
     }
@@ -35,12 +40,24 @@ const Register = () => {
       return;
     }
 
-    // Replace with actual registration logic (e.g., API call)
-    if (username === "newuser" && password === "password") {
-      setSuccess("Registration successful! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000);
-    } else {
-      setError("An error occurred during registration.");
+    try {
+      // API call to register the user
+      const response = await axios.post("http://127.0.0.1:5000/signup", {
+        username,
+        password,
+        pronouns,
+        ability,
+        dob,
+      });
+
+      if (response.status === 200) {
+        setSuccess("Registration successful! Redirecting to login...");
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+    } catch (err) {
+      setError(err.response?.data?.description || "An error occurred during registration.");
     }
   };
 
@@ -78,6 +95,35 @@ const Register = () => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </FormControl>
+            <FormControl id="pronouns" isRequired mt="4">
+              <FormLabel>Pronouns</FormLabel>
+              <Select
+                placeholder="Select pronouns"
+                value={pronouns}
+                onChange={(e) => setPronouns(e.target.value)}
+              >
+                <option value="he/him">He/Him</option>
+                <option value="she/her">She/Her</option>
+                <option value="they/them">They/Them</option>
+                <option value="other">Other</option>
+              </Select>
+            </FormControl>
+            <FormControl id="ability" isRequired mt="4">
+              <FormLabel>Ability</FormLabel>
+              <Input
+                placeholder="Enter your ability (e.g., climbing, coding)"
+                value={ability}
+                onChange={(e) => setAbility(e.target.value)}
+              />
+            </FormControl>
+            <FormControl id="dob" isRequired mt="4">
+              <FormLabel>Date of Birth</FormLabel>
+              <Input
+                type="date"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
               />
             </FormControl>
             <Button type="submit" mt="6" colorScheme="blue" width="full">

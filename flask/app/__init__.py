@@ -54,7 +54,7 @@ def create_app():
     # These are global variables that are needed elsewhere
     # FIXME: Not sure if this needs to be global
     global bcrypt
-
+    
     app = Flask(__name__)
 
     app.config.from_object(Config)

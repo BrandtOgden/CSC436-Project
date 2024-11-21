@@ -25,7 +25,6 @@ def signup():
     ability = data.get('ability')
     dob = data.get('dob')
 
-
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     try:
@@ -41,7 +40,8 @@ def signup():
         user_id = cursor.lastrowid
         cursor.close()
 
-        # Generate JWT
+        # Now generate JWT
+        # FIXME: Going to want to make this username and make username unique
         token = create_access_token(identity=user_id)
         return jsonify({"jwt": token}), 200
     except Exception as e:

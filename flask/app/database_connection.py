@@ -12,7 +12,6 @@ def connect_db():
     """
     current_app.logger.info("Connecting to AWS MySQL database")
     if 'db' not in g:
-        connection = None
         try:
             connection = mysql.connector.connect(
                 host=os.getenv('DB_HOST'),
@@ -22,12 +21,12 @@ def connect_db():
                 connect_timeout=10
             )
             current_app.logger.info("Connected to AWS MySQL database")
-        except mysql.connector.Error as e:
-            current_app.logger.info(f"Error connecting to AWS MySQL database: {e}")
-            print(e)
-            abort(500, description=f"Error connecting to AWS MySQL database: {e}")
 
-        g.db = connection
+            g.db = connection
+        except mysql.connector.Error as e:
+            error = f"Error connecting to AWS MySQL database: {e}"
+            current_app.logger.info(error)
+            abort(500, description=error)
     return g.db    
 
 

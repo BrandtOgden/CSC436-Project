@@ -124,7 +124,7 @@ INSERT INTO c_event (id, location, e_time, post_id) VALUES
 (8, 'Basecamp Boulder', '2025-01-12 16:00:00', 8);
 
 -- Populating the c_liked table with some likes on posts
-INSERT INTO c_liked (user_id, post_id, time_liked) VALUES
+INSERT INTO c_liked (user_id, post_id, date_liked) VALUES
 (1, 2, '2024-10-01 10:00:00'),
 (2, 1, '2024-10-02 12:00:00'),
 (3, 4, '2024-10-02 14:30:00'),

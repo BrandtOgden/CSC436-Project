@@ -24,7 +24,7 @@ def register_error_handlers(app):
     def handle_conflict(error):
         """
         Handles 409 HTTP Error - Conflict
-        Used for non unique username provided at sign in
+        Used when a requested record to be inserted is already in the database
         """
         app.logger.error(f"409 (Conflict): {error.description}")
         return jsonify({'message': error.description}), 409

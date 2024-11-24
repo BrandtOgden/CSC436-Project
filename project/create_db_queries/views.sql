@@ -3,20 +3,35 @@ This files holds all of the views that are created for this project
 */
 use Climbing;
 
--- View that gets the 10 most recent posts
+-- Gets the 10 most recent posts
 CREATE VIEW recent_posts AS
 SELECT 
-	post.id as post_id,
+	post.id post_id,
     title,
-    p_description as post_description,
+    p_description post_description,
     image_url,
     date_created,
-    username AS created_by
+    username created_by
 FROM 
 	post
-INNER JOIN
+JOIN
 	c_user ON c_user.id = post.created_by
 ORDER BY
 	post.date_created DESC
 LIMIT 10;
+
+-- Gets all the friends of user
+drop view get_friends;
+CREATE VIEW get_friends AS 
+SELECT 
+	u2.username, 
+	date_accepted,
+    requested_id
+FROM friend 
+JOIN
+	c_user u1 ON u1.id = requested_id
+JOIN 
+	c_user u2 ON u2.id = accepted_id
+ORDER BY 
+	friend.date_accepted;
     

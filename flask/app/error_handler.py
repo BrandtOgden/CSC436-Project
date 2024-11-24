@@ -18,6 +18,14 @@ def register_error_handlers(app):
         app.logger.error(f"ERROR: 401 (Unauthorized Access): {error.description}")
         return jsonify({'message': error.description}), 401
 
+    @app.errorhandler(409)
+    def handle_conflict(error):
+        """
+        Handles 409 HTTP Error - Conflict
+        Used if record to be inserted is already in the database 
+        """
+        app.logger.error(f"409 (Conflict): {error.description}")
+        return jsonify({'message': error.description}), 409
 
     @app.errorhandler(500)
     def handle_internal_error(error):

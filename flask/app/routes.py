@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from .database_connection import connect_db
 
@@ -26,7 +26,7 @@ def get_users():
 
 @routes.route('/posts', methods=['GET'])
 @jwt_required(optional=True)
-def get_posts():
+def posts():
     """
     Returns 10 most recent posts using recent_posts view
     """
@@ -35,3 +35,52 @@ def get_posts():
     posts = cursor.fetchall()
     cursor.close()
     return jsonify(posts), 200
+
+
+@routes.route('/friends', methods=['GET', 'POST', 'DELETE'])
+@jwt_required()
+def friends():
+    """
+    Uses JWT to manage friends for current user
+    'GET': Returns a list of the user's current friends
+        Returns 204 if the user doesn't have any friends
+    'POST': Adds specified friend 
+    'DELETE': Deletes specified friend
+    """
+    user_id = get_jwt_identity()
+    cursor = connect_db().cursor(dictionary=True)
+
+    if request.method == 'GET':
+        cursor.execute('SELECT username, date_accepted FROM get_friends WHERE requested_id = %s', (user_id,))
+        friends = cursor.fetchall()
+        cursor.close()
+
+        if not friends:
+            return '', 204
+        
+        return jsonify(friends), 200
+    elif request.method == 'POST' or request.method == 'DELETE':
+        data = request.get_json()
+
+        if not data or 'friend_id' not in data:
+            abort(401, description="friend_id required")
+
+        friend_id = data['friend_id']
+
+        if request.method == 'POST':
+            # Check if already friend
+            cursor.execute('SELECT * FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
+            response = cursor.fetchall()
+            if response:
+                abort(409, description="Friend already exists")
+
+            cursor.execute('INSERT INTO friend (requested_id, accepted_id) VALUES (%s, %s)', (user_id, friend_id))
+            cursor._connection.commit()
+
+            return '', 204
+        elif request.method == 'DELETE':
+            # Not going to return an error if the friend doesn't exist because it's getting deleted anyway
+            cursor.execute('DELETE FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
+            cursor._connection.commit()
+            
+            return '', 204

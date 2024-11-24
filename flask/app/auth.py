@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, abort, current_app
 from flask_jwt_extended import create_access_token
 from .database_connection import connect_db 
+from datetime import timedelta
 
 auth = Blueprint('auth', __name__)
 
@@ -40,10 +41,10 @@ def signup():
         user_id = cursor.lastrowid
         cursor.close()
 
-        # Now generate JWT
+        # Now generate JWT, valid for 1 hour
         # FIXME: Going to want to make this username and make username unique
-        token = create_access_token(identity=user_id)
-        return jsonify({"jwt": token}), 200
+        token = create_access_token(identity=user_id, expires_delta=timedelta(hours=1))
+        return jsonify({"jwt": token}), 201
     except Exception as e:
         abort(500, description=f"Database Error: {e}")
 
@@ -51,12 +52,11 @@ def signup():
 @auth.route('/login', methods=['POST'])
 def login():
     """
-    Checks if user is in database
+    Checks if user is in database and returns the JWT to be used for session if they are
     """
     data = request.get_json()
 
     if not data or 'username' not in data or 'password' not in data:
-        print("outside")
         abort(400, description="Username and password are required")
 
     username = data.get('username')

@@ -8,6 +8,7 @@ auth = Blueprint('auth', __name__)
 def signup():
     """
     Creates new user in database
+    Returns 409 if the username provided is already in the database
     """
     data = request.get_json()
 
@@ -25,27 +26,30 @@ def signup():
     ability = data.get('ability')
     dob = data.get('dob')
 
+    # Make sure user is unique
+    cursor = connect_db().cursor()
+    cursor.execute("SELECT * FROM c_user WHERE username = %s", (username,))
+    user = cursor.fetchone()
+
+    if user:
+        abort(409, description="Username already exists")
+
     password_hash = current_app.bcrypt.generate_password_hash(password).decode('utf-8')
 
-    try:
-        cursor = connect_db().cursor()
-        cursor.execute(
-            "INSERT INTO c_user (username, pronouns, ability, date_of_birth, password_hash) \
-            VALUES (%s, %s, %s, %s, %s)",
-            (username, pronouns, ability, dob, password_hash)
-        )
-        cursor._connection.commit()
+    cursor.execute(
+        "INSERT INTO c_user (username, pronouns, ability, date_of_birth, password_hash) \
+        VALUES (%s, %s, %s, %s, %s)",
+        (username, pronouns, ability, dob, password_hash)
+    )
+    cursor._connection.commit()
 
-        # Get the ID of the newly created user
-        user_id = cursor.lastrowid
-        cursor.close()
+    # Get the ID of the newly created user
+    user_id = cursor.lastrowid
+    cursor.close()
 
-        # Now generate JWT
-        # FIXME: Going to want to make this username and make username unique
-        token = create_access_token(identity=user_id)
-        return jsonify({"jwt": token}), 200
-    except Exception as e:
-        abort(500, description=f"Database Error: {e}")
+    # Now generate JWT
+    token = create_access_token(identity=user_id)
+    return jsonify({"jwt": token}), 200
 
 
 @auth.route('/login', methods=['POST'])
@@ -63,7 +67,7 @@ def login():
     password = data.get('password')
        
     cursor = connect_db().cursor(dictionary=True)
-    cursor.execute("SELECT id, password_hash FROM c_user WHERE username = %s LIMIT 1", (username,))
+    cursor.execute("SELECT id, password_hash FROM c_user WHERE username = %s", (username,))
     db_response = cursor.fetchone()
     cursor.close()
 

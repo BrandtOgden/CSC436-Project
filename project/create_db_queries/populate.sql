@@ -3,17 +3,6 @@ This file will populate the various tables with dummy values
 Probably going to want to use ChatGPT to generate this data in some form
 */
 
--- creates view
-
--- CREATE VIEW event_details AS
--- SELECT p.id AS post_id, p.title, p.p_description, e.location, e.e_time, u.u_name AS created_by
--- FROM c_event e
--- JOIN post p ON e.post_id = p.id
--- JOIN c_user u ON p.created_by = u.id;
-
--- looks at view
--- SELECT * FROM event_details;
-
 -- Populating the c_user table with users
 INSERT INTO c_user (username, pronouns, ability, date_of_birth) VALUES
 ('Alex Smith', 'they/them', 'Intermediate', '1999-08-15'),
@@ -195,9 +184,3 @@ INSERT INTO workout (id, w_name, w_description, post_id) VALUES
 (6, 'Dynamic Stretching', 'Pre-climb stretching routine.', 6),
 (7, 'Explosive Power Training', 'Training for powerful climbing moves.', 7),
 (8, 'Mental Focus Drills', 'Exercises to build mental resilience.', 8);
-
-
-
-
-
-

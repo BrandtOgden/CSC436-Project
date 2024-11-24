@@ -18,14 +18,15 @@ CREATE TABLE c_user (
     username VARCHAR(20),
     pronouns VARCHAR(20),
     ability VARCHAR(20),
-    date_of_birth CHAR(10)
+    date_of_birth CHAR(10),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Many to many relationship between users
 CREATE TABLE friend (
     requested_id INT,
     accepted_id INT,
-    date_accepted DATETIME,
+    date_accepted DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (requested_id , accepted_id),
     FOREIGN KEY (requested_id)
         REFERENCES c_user (id)
@@ -62,7 +63,7 @@ CREATE TABLE post (
     p_description VARCHAR(100),
     image_url VARCHAR(100),
     created_by INT,
-    date_created DATETIME,
+    date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by)
         REFERENCES c_user (id)
         ON DELETE CASCADE
@@ -93,7 +94,7 @@ CREATE TABLE workout (
 CREATE TABLE c_liked (
     user_id INT,
     post_id INT,
-    time_liked DATETIME,
+    date_liked DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id , post_id),
     FOREIGN KEY (user_id)
         REFERENCES c_user (id)
@@ -111,6 +112,7 @@ CREATE TABLE achievement (
 CREATE TABLE has_achievement (
     user_id INT,
     a_name VARCHAR(30),
+    date_got DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id , a_name),
     FOREIGN KEY (user_id)
         REFERENCES c_user (id)

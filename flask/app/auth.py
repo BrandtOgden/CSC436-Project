@@ -8,6 +8,7 @@ auth = Blueprint('auth', __name__)
 def signup():
     """
     Creates new user in database
+    Username must be unique
     """
     data = request.get_json()
 
@@ -41,7 +42,6 @@ def signup():
         cursor.close()
 
         # Now generate JWT
-        # FIXME: Going to want to make this username and make username unique
         token = create_access_token(identity=user_id)
         return jsonify({"jwt": token}), 200
     except Exception as e:

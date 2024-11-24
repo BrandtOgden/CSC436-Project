@@ -23,11 +23,11 @@ def connect_db():
             current_app.logger.info("Connected to AWS MySQL database")
 
             g.db = connection
-            return connection
         except mysql.connector.Error as e:
             error = f"Error connecting to AWS MySQL database: {e}"
             current_app.logger.info(error)
             abort(500, description=error)
+    return g.db    
 
 
 def disconnect_db(error=None):

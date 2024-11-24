@@ -15,7 +15,7 @@ FLUSH PRIVILEGES;
 
 CREATE TABLE c_user (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(20),
+    username VARCHAR(20) NOT NULL UNIQUE,
     pronouns VARCHAR(20),
     ability VARCHAR(20),
     date_of_birth CHAR(10),

@@ -9,6 +9,7 @@ auth = Blueprint('auth', __name__)
 def signup():
     """
     Creates new user in database
+    Returns 409 if the username provided is already in the database
     """
     data = request.get_json()
 
@@ -26,6 +27,14 @@ def signup():
     ability = data.get('ability')
     dob = data.get('dob')
 
+    # Make sure user is unique
+    cursor = connect_db().cursor()
+    cursor.execute("SELECT * FROM c_user WHERE username = %s", (username,))
+    user = cursor.fetchone()
+
+    if user:
+        abort(409, description="Username already exists")
+
     password_hash = current_app.bcrypt.generate_password_hash(password).decode('utf-8')
 
     try:
@@ -42,7 +51,6 @@ def signup():
         cursor.close()
 
         # Now generate JWT, valid for 1 hour
-        # FIXME: Going to want to make this username and make username unique
         token = create_access_token(identity=user_id, expires_delta=timedelta(hours=1))
         return jsonify({"jwt": token}), 201
     except Exception as e:
@@ -63,7 +71,7 @@ def login():
     password = data.get('password')
        
     cursor = connect_db().cursor(dictionary=True)
-    cursor.execute("SELECT id, password_hash FROM c_user WHERE username = %s LIMIT 1", (username,))
+    cursor.execute("SELECT id, password_hash FROM c_user WHERE username = %s", (username,))
     db_response = cursor.fetchone()
     cursor.close()
 

@@ -14,7 +14,7 @@ CREATE VIEW recent_posts AS
         username created_by
     FROM
         post
-	JOIN
+    JOIN
         c_user ON c_user.id = post.created_by
     ORDER BY post.date_created DESC
     LIMIT 10;
@@ -26,9 +26,9 @@ CREATE VIEW get_friends AS
         u2.username, date_accepted, requested_id
     FROM
         friend
-	JOIN
+    JOIN
         c_user u1 ON u1.id = requested_id
-	JOIN
+    JOIN
         c_user u2 ON u2.id = accepted_id
     ORDER BY friend.date_accepted;
     

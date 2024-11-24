@@ -21,7 +21,6 @@ ORDER BY
 LIMIT 10;
 
 -- Gets all the friends of user
-drop view get_friends;
 CREATE VIEW get_friends AS 
 SELECT 
 	u2.username, 

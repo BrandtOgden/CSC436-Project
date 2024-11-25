@@ -63,6 +63,7 @@ def friends():
         data = request.get_json()
 
         if not data or 'friend_id' not in data:
+            cursor.close()
             abort(401, description="friend_id required")
 
         friend_id = data['friend_id']
@@ -72,15 +73,70 @@ def friends():
             cursor.execute('SELECT * FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
             response = cursor.fetchall()
             if response:
+                cursor.close()
                 abort(409, description="Friend already exists")
 
             cursor.execute('INSERT INTO friend (requested_id, accepted_id) VALUES (%s, %s)', (user_id, friend_id))
             cursor._connection.commit()
+            cursor.close()
 
             return '', 204
         elif request.method == 'DELETE':
             # Not going to return an error if the friend doesn't exist because it's getting deleted anyway
             cursor.execute('DELETE FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
             cursor._connection.commit()
+            cursor.close()
             
             return '', 204
+    
+    abort(500, description="routes.py friends() should never get here")
+
+
+@routes.route('/profile', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def profile():
+    """
+    Uses JWT to manage the profile settings for the user
+    'GET': Returns all information about the user
+    'PUT': Updates specified profile settings
+        Must specify one or more valid settings to update
+    'DELETE': Deletes the user from the database
+    """
+    user_id = get_jwt_identity()
+    cursor = connect_db().cursor(dictionary=True)
+
+    if request.method == 'GET':
+        cursor.execute('SELECT username, pronouns, ability, date_of_birth, created_at FROM c_user \
+                       WHERE id = %s', (user_id,))
+        profile = cursor.fetchall()
+        cursor.close()
+
+        if not profile:
+            abort(500, description="Profile not found (should never happen)")
+
+        return jsonify(profile), 200
+    elif request.method == 'PUT':
+        data = request.get_json()
+        settings = ['username', 'pronouns', 'ability', 'date_of_birth']
+
+        if not data:
+            abort(400, description=f"No body. Use one or more of the following variables: {settings}")
+
+        for key in data.keys():
+            if key not in settings:
+                abort(400, description=f"Invalid setting. Use one or more of the following variables: {settings}")
+
+        for key, val in data.items():
+            cursor.execute(f'UPDATE c_user SET {key} = %s WHERE id = %s', (val, user_id))
+            cursor._connection.commit()
+        cursor.close()
+
+        return '', 204
+    elif request.method == 'DELETE':
+        cursor.execute('DELETE FROM c_user WHERE id = %s', (user_id,))
+        cursor._connection.commit()
+        cursor.close()
+
+        return '', 204
+
+    abort(500, description="routes.py profile() should never get here")

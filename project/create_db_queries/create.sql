@@ -10,7 +10,7 @@ USE Climbing;
 
 -- User that Flask uses to connect to database
 -- CREATE USER 'flask'@'%' IDENTIFIED BY 'Fl@5kFl@5k!';
-GRANT SELECT, INSERT, DELETE ON Climbing.* TO 'flask'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON Climbing.* TO 'flask'@'%';
 FLUSH PRIVILEGES;
 
 CREATE TABLE c_user (

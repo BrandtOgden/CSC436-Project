@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, abort
+from flask import Blueprint, jsonify, request, abort, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from .database_connection import connect_db
 
@@ -44,7 +44,7 @@ def friends():
     Uses JWT to manage friends for current user
     'GET': Returns a list of the user's current friends
         Returns 204 if the user doesn't have any friends
-    'POST': Adds specified friend 
+    'POST': Adds specified friend
     'DELETE': Deletes specified friend
     """
     user_id = get_jwt_identity()
@@ -57,7 +57,7 @@ def friends():
 
         if not friends:
             return '', 204
-        
+
         return jsonify(friends), 200
     elif request.method == 'POST' or request.method == 'DELETE':
         data = request.get_json()
@@ -86,10 +86,33 @@ def friends():
             cursor.execute('DELETE FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
             cursor._connection.commit()
             cursor.close()
-            
+
             return '', 204
-    
+
     abort(500, description="routes.py friends() should never get here")
+
+
+@routes.route('/current_user', methods=['GET'])
+@jwt_required()
+def current_user():
+    try:
+        user_id = get_jwt_identity()
+        current_app.logger.info(f"Decoded User ID (as string): {user_id}")  # Use current_app
+
+        cursor = connect_db().cursor(dictionary=True)
+        cursor.execute("SELECT username FROM c_user WHERE id = %s", (int(user_id),))  # Convert to int for DB query
+        user = cursor.fetchone()
+        cursor.close()
+
+        if not user:
+            current_app.logger.error(f"No user found with ID: {user_id}")
+            return jsonify({"error": "User not found"}), 404
+
+        current_app.logger.info(f"Retrieved User: {user}")
+        return jsonify(user), 200
+    except Exception as e:
+        current_app.logger.error(f"Error in /current_user: {e}")
+        return jsonify({"error": "Invalid token or server issue"}), 422
 
 
 @routes.route('/profile', methods=['GET', 'PUT', 'DELETE'])

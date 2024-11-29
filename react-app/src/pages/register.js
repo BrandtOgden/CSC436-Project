@@ -54,6 +54,7 @@ const Register = () => {
         setSuccess("Registration successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 2000);
       } else {
+        // Here instead of else would need to catch 409 and tell user their username already exists
         setError("Registration failed. Please try again.");
       }
     } catch (err) {

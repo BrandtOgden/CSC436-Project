@@ -1,10 +1,7 @@
 import React from "react";
-import { Outlet, Routes, Route, Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { Box, Flex, Text, Icon, useColorModeValue } from "@chakra-ui/react";
-import { MdHome, MdSettings, MdMenu } from "react-icons/md";
-import Home from "../pages/home";
-import Settings from "../pages/settings";
-import Profile from "../pages/profile";
+import { MdForum, MdTerrain, MdGroup, MdSettings, MdArrowBack  } from "react-icons/md";
 
 const Layout = () => {
   const NavItem = ({ icon, label, to }) => (
@@ -34,24 +31,17 @@ const Layout = () => {
         shadow="md"
       >
         <Text fontSize="2xl" fontWeight="bold" mb="6">
-          Climbing App
+          Climbify
         </Text>
-        <NavItem icon={MdHome} label="Home" to="/" />
-        {/* Add a new NavItem for the profile page*/}
-        {/* Add icon for this navitem as stacked bars */}
-        <NavItem icon={MdMenu} label="Profile" to="/profile" />        
-
-        <NavItem icon={MdSettings} label="Settings" to="/settings" />
-
-
+        {/* Add any menu items here */}
+        <NavItem icon={MdForum} label="View Posts" to="view_posts" />
+        <NavItem icon={MdTerrain} label="Climbs" to="climbs" />
+        <NavItem icon={MdGroup} label="Friends" to="friends" />
+        <NavItem icon={MdSettings} label="Account Settings" to="settings" />
+        <NavItem icon={MdArrowBack} label="Back to Landing" to="/" />
       </Box>
       <Box flex="1" p="6" bg={useColorModeValue("white", "gray.900")}>
-        {/*  routes for Home and Settings */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
+        <Outlet />
       </Box>
     </Box>
   );

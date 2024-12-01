@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../config"
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -42,7 +43,7 @@ const Register = () => {
 
     try {
       // API call to register the user
-      const response = await axios.post("http://127.0.0.1:5000/signup", {
+      const response = await axios.post(`${API_URL}/signup`, {
         username,
         password,
         pronouns,
@@ -50,7 +51,7 @@ const Register = () => {
         dob,
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         setSuccess("Registration successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 2000);
       } else {

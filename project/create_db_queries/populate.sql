@@ -130,23 +130,24 @@ INSERT INTO c_liked (user_id, post_id, date_liked) VALUES
 (4, 9, '2024-10-16 12:45:00');
 
 -- Populating the climbed table to record user climbs
-INSERT INTO climbed (c_user_id, climb_information_id) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5),
-(6, 6),
-(7, 7),
-(8, 8),
-(1, 3),
-(2, 4),
-(3, 5),
-(4, 6),
-(5, 7),
-(6, 8),
-(9, 1),
-(10, 2);
+INSERT INTO climbed (c_user_id, climb_information_id, date_climbed)
+VALUES
+(1, 1, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(2, 2, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(3, 3, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(4, 4, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(5, 5, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(6, 6, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(7, 7, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(8, 8, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(1, 3, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(2, 4, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(3, 5, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(4, 6, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(5, 7, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(6, 8, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(9, 1, NOW() - INTERVAL FLOOR(RAND() * 30) DAY),
+(10, 2, NOW() - INTERVAL FLOOR(RAND() * 30) DAY);
 
 -- Populating the friend table with some fake friendships
 INSERT INTO friend (requested_id, accepted_id, date_accepted) VALUES

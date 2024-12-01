@@ -89,6 +89,7 @@ def friends():
             
             return '', 204
     
+    cursor.close()
     abort(500, description="routes.py friends() should never get here")
 
 
@@ -120,10 +121,12 @@ def profile():
         settings = ['username', 'pronouns', 'ability', 'date_of_birth']
 
         if not data:
+            cursor.close()
             abort(400, description=f"No body. Use one or more of the following variables: {settings}")
 
         for key in data.keys():
             if key not in settings:
+                cursor.close()
                 abort(400, description=f"Invalid setting. Use one or more of the following variables: {settings}")
 
         for key, val in data.items():
@@ -140,4 +143,60 @@ def profile():
 
         return '', 204
 
+    cursor.close()
     abort(500, description="routes.py profile() should never get here")
+
+@routes.route('/climb', methods=['GET', 'POST'])
+@jwt_required(optional=True)
+def climb():
+    """
+    Handles climbs based on a user
+    'GET': Returns all climbs in the database (JWT not given) or the climbs completed by a user (JWT Given)
+        Returns with 404 error if no climbs were found
+    'POST': Says that a user has done a climb, adds the climb to the climbed table
+    """
+    cursor = connect_db().cursor(dictionary=True)
+
+    if request.method == 'GET':
+        user_id = get_jwt_identity()
+
+        climbs = None
+        if not user_id:
+            # Getting all climbs
+            cursor.execute('SELECT c_name, c_description, grade, location FROM climb_information')
+            climbs = cursor.fetchall()
+        else:
+            # Getting climbs completed by user
+            print(user_id)
+            cursor.execute('SELECT * FROM get_climbs WHERE c_user_id = %s', (user_id,))
+            climbs = cursor.fetchall()
+
+        cursor.close()
+
+        if not climbs:
+            abort(404, description='No climbs found')
+        
+        return jsonify(climbs)
+    elif request.method == 'POST':
+        user_id = get_jwt_identity()
+
+        if not user_id:
+            cursor.close()
+            abort(401, description="JWT is required for POST")
+
+        data = request.get_json()
+
+        if not data or 'climb_information_id' not in data:
+            cursor.close()
+            abort(400, description="Request must have `climb_information_id`")
+
+        climb_information_id = data['climb_information_id']
+
+        cursor.execute('INSERT INTO climbed (c_user_id, climb_information_id) VALUES (%s, %s)', (user_id, climb_information_id))
+        cursor._connection.commit()
+        cursor.close()
+
+        return '', 204
+
+    cursor.close()
+    abort(500, description="routes.py climb() should never get here")

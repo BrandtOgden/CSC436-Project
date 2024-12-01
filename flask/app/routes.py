@@ -151,14 +151,26 @@ def profile():
 def climb():
     """
     Handles climbs based on a user
-    'GET': Returns all climbs in the database
+    'GET': Returns all climbs in the database (JWT not given) or the climbs completed by a user (JWT Given)
+        Returns with 404 error if no climbs were found
     'POST': Says that a user has done a climb, adds the climb to the climbed table
     """
     cursor = connect_db().cursor(dictionary=True)
 
     if request.method == 'GET':
-        cursor.execute('SELECT c_name, c_description, grade, location FROM climb_information')
-        climbs = cursor.fetchall()
+        user_id = get_jwt_identity()
+
+        climbs = None
+        if not user_id:
+            # Getting all climbs
+            cursor.execute('SELECT c_name, c_description, grade, location FROM climb_information')
+            climbs = cursor.fetchall()
+        else:
+            # Getting climbs completed by user
+            print(user_id)
+            cursor.execute('SELECT * FROM get_climbs WHERE c_user_id = %s', (user_id,))
+            climbs = cursor.fetchall()
+
         cursor.close()
 
         if not climbs:

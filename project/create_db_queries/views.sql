@@ -32,3 +32,19 @@ CREATE VIEW get_friends AS
         c_user u2 ON u2.id = accepted_id
     ORDER BY friend.date_accepted;
     
+-- Gets all of the climbs that have been completed by a user
+CREATE VIEW get_climbs AS
+    SELECT 
+        c_user_id,
+        climb_information_id,
+        date_climbed,
+        c_name,
+        c_description,
+        grade,
+        location
+    FROM
+        climbed
+    JOIN 
+        climb_information on climb_information_id = climb_information.id
+    ORDER BY date_climbed DESC;
+        

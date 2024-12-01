@@ -59,7 +59,11 @@ const Register = () => {
         setError("Registration failed. Please try again.");
       }
     } catch (err) {
-      setError(err.response?.data?.description || "An error occurred during registration.");
+      if (err.status === 409) {
+        setError("Username already exists!! Pick a different one.")
+      } else {
+        setError(err.response?.data?.description || "An unknown error occurred during registration.");
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Flex,
@@ -29,7 +29,7 @@ const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editData, setEditData] = useState({});
-  const dummyData = {
+  const dummyData = useMemo(() => ({
     u_name: "John Doe",
     pronouns: "he/him",
     followers: [{ id: 1, name: "Alice" }, { id: 2, name: "Bob" }],
@@ -77,16 +77,12 @@ const Profile = () => {
         e_time: "2025-01-05T09:00:00Z",
       },
     ],
-  };
+  }), []);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const boxBgColor = useColorModeValue("white", "gray.800");
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await axios.get("http://localhost:3000/api/profile", {
@@ -99,7 +95,11 @@ const Profile = () => {
       setUserData(dummyData); // Use dummy data for now
       setLoading(false);
     }
-  };
+  }, [dummyData]);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   const handleEdit = (section, item) => {
     setEditData({ section, item });
@@ -165,7 +165,7 @@ const Profile = () => {
     );
   }
 
-  const { u_name, pronouns, posts, climbs, achievements, events } = userData;
+  const { u_name, pronouns, posts, climbs, achievements } = userData;
 
   return (
     <Box bg={bgColor} minHeight="100vh" p={6}>

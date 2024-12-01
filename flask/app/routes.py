@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, abort
+from flask import Blueprint, jsonify, request, abort, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from .database_connection import connect_db
 
@@ -127,6 +127,7 @@ def profile():
                 abort(400, description=f"Invalid setting. Use one or more of the following variables: {settings}")
 
         for key, val in data.items():
+            current_app.logger.info(f'Updating {key} to {val}')
             cursor.execute(f'UPDATE c_user SET {key} = %s WHERE id = %s', (val, user_id))
             cursor._connection.commit()
         cursor.close()

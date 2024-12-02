@@ -17,7 +17,7 @@ const Friends = () => {
     const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [newFriendId, setNewFriendId] = useState("");
+    const [newFriendUsername, setNewFriendUsername] = useState("");
     const [currentUser, setCurrentUser] = useState(""); // State for the current user's username
     const toast = useToast();
 
@@ -76,12 +76,11 @@ const Friends = () => {
         }
     };
 
-    // Add a new friend
     const addFriend = async () => {
-        if (!newFriendId) {
+        if (!newFriendUsername.trim()) {
             toast({
                 title: "Error",
-                description: "Please enter a valid Friend ID.",
+                description: "Please enter a valid username.",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -96,7 +95,7 @@ const Friends = () => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
-                body: JSON.stringify({ friend_id: parseInt(newFriendId) }),
+                body: JSON.stringify({ username: newFriendUsername }),
             });
 
             if (!response.ok) {
@@ -113,18 +112,19 @@ const Friends = () => {
 
             toast({
                 title: "Success",
-                description: "Friend added successfully!",
+                description: `Friend '${newFriendUsername}' added successfully!`,
                 status: "success",
                 duration: 3000,
                 isClosable: true,
             });
 
-            setNewFriendId("");
-            fetchFriends(); // Refresh the friend list
+            // Refresh the friends list
+            fetchFriends();
         } catch (err) {
+            console.error("Error adding friend:", err);
             toast({
                 title: "Error",
-                description: "An error occurred while adding the friend.",
+                description: "An unexpected error occurred.",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -132,8 +132,9 @@ const Friends = () => {
         }
     };
 
-    // Remove a friend
-    const removeFriend = async (friendId) => {
+
+
+    const removeFriend = async (friendUsername) => {
         try {
             const response = await fetch("http://127.0.0.1:5000/friends", {
                 method: "DELETE",
@@ -141,32 +142,43 @@ const Friends = () => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
-                body: JSON.stringify({ friend_id: friendId }),
+                body: JSON.stringify({ username: friendUsername }),
             });
 
             if (!response.ok) {
-                throw new Error("Failed to remove friend.");
+                const errorData = await response.json();
+                toast({
+                    title: "Error",
+                    description: errorData.description || "Failed to remove friend.",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                });
+                return;
             }
 
             toast({
                 title: "Success",
-                description: "Friend removed successfully.",
+                description: `Friend '${friendUsername}' removed successfully!`,
                 status: "success",
                 duration: 3000,
                 isClosable: true,
             });
 
-            setFriends((prev) => prev.filter((friend) => friend.friend_id !== friendId));
+            // Refresh the friends list
+            fetchFriends();
         } catch (err) {
             toast({
                 title: "Error",
-                description: err.message || "An error occurred while removing the friend.",
+                description: "An unexpected error occurred.",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
             });
         }
     };
+
+
 
     // Fetch current user and friends on component mount
     useEffect(() => {
@@ -209,7 +221,7 @@ const Friends = () => {
                             <Button
                                 colorScheme="red"
                                 size="sm"
-                                onClick={() => removeFriend(friend.friend_id)}
+                                onClick={() => removeFriend(friend.username)} // Pass username
                             >
                                 Remove
                             </Button>
@@ -220,12 +232,12 @@ const Friends = () => {
 
             <Box mt="6">
                 <FormControl>
-                    <FormLabel>Add Friend by ID</FormLabel>
+                    <FormLabel>Add Friend by Username</FormLabel>
                     <Flex>
                         <Input
-                            placeholder="Enter Friend ID"
-                            value={newFriendId}
-                            onChange={(e) => setNewFriendId(e.target.value)}
+                            placeholder="Enter Friend's Username"
+                            value={newFriendUsername}
+                            onChange={(e) => setNewFriendUsername(e.target.value)}
                         />
                         <Button
                             ml="2"

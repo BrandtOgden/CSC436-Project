@@ -7,6 +7,7 @@ import Landing from "./pages/landing"
 // import Home from "./pages/home";
 import Settings from "./pages/settings";
 import Profile from "./pages/profile";
+import Friends from "./pages/friends";
 
 const App = () => {
   return (
@@ -19,7 +20,7 @@ const App = () => {
         <Route path="/home" element={<Layout />}>
           <Route path="view_posts" element={<h1>View Posts</h1>} />
           <Route path="climbs" element={<Profile />} />
-          <Route path="friends" element={<h1>Friends</h1>} />
+          <Route path="friends" element={<Friends />} />
           <Route path="settings" element={<Settings />} /> 
           <Route path="profile" element={<Profile />} />
         </Route>

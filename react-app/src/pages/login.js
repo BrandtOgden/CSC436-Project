@@ -10,6 +10,7 @@ import {
   Heading,
   Text,
   useColorModeValue,
+  Spinner
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import API_URL from "../config"
@@ -19,10 +20,12 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true)
 
     try {
       const response = await fetch(`${API_URL}/login`, {
@@ -35,7 +38,7 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.description || "Login failed. Please try again.");
+        setError(errorData.description || "Unknown error occurred. Please try again.");
         return;
       }
 
@@ -46,6 +49,8 @@ const Login = () => {
     } catch (err) {
       setError("An error occurred while logging in. Please try again.");
       console.error("Login error:", err);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -76,9 +81,15 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </FormControl>
+            {loading ? (
+              <Box mt="6" display="flex" justifyContent="center" alignItems="center">
+                <Spinner size="xl" />
+              </Box>
+            ) : 
             <Button type="submit" mt="6" colorScheme="blue" width="full">
               Login
             </Button>
+            }
           </form>
           <Text mt="4">
             Don’t have an account?{" "}

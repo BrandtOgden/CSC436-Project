@@ -10,6 +10,7 @@ import {
   useToast,
   useColorModeValue,
   Spinner,
+    Select,
 } from "@chakra-ui/react";
 import axios from "axios";
 import API_URL from "../config"
@@ -164,13 +165,18 @@ const Settings = () => {
               placeholder="Date of Birth"
               width="80%"
             />
-            <Input
-              name="ability"
-              value={personalInfo.ability}
-              onChange={handleInputChange}
-              placeholder="Ability"
-              width="80%"
-            />
+            <Select
+                name="ability"
+                value={personalInfo.ability}
+                onChange={handleInputChange}
+                placeholder="Select your skill level"
+                width="80%"
+            >
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+              <option value="Expert">Expert</option>
+            </Select>
             <Stack direction="row" spacing={6} width="80%" justify="center">
               <Button colorScheme="blue" onClick={saveChanges} isLoading={loading}>
                 Save Changes

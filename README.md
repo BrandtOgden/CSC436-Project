@@ -23,5 +23,5 @@ To install the Flask dependencies used for this project, from the `flask` direct
 To install React dependencies navigate to the `react-app` directory and run `npm install`.
 
 ## Running The App
-To get started you need to start the Flask API and then the React frontend navigate to `flask` directory and run `python3 run.py`. On a separate terminal navigate to `react-app` directory and rum `npm start`, and you should see a very basic HTML frontend that has the output from the database.   
+To get started you need to start the Flask API and then the React frontend navigate to `flask` directory and run `python3 run.py`. On a separate terminal navigate to `react-app` directory and rum `npm start`, and you should automatically be brought to the Climbify homepage.   
 

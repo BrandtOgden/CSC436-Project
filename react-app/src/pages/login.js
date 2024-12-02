@@ -35,7 +35,7 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.description || "Login failed. Please try again.");
+        setError(errorData.description || "Unknown error occurred. Please try again.");
         return;
       }
 

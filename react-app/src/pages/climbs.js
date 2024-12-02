@@ -71,13 +71,67 @@ const Climbs = () => {
     const toast = useToast();
 
     // ===============================================================================
-    const markCompletedClick = (climb) => {
-        console.log("Mark as completed clicked on:", climb.id)
+    const markCompletedClick = async (climb) => {
+        setLoading(true)
+        try {
+            const token = localStorage.getItem("token");
+            await axios.post(`${API_URL}/climbs`, 
+                { climb_information_id: climb.id },
+                { headers: { Authorization: `Bearer ${token}` }, }
+            );
+            toast({
+                title: "Climb marked as completed!",
+                status: "success",
+                duration: 5000,
+                isClosable: true
+            });
+        } catch (error) {
+            console.error("ERROR in markCompletedClick():", error);
+            toast({
+                title: "Error marking climb as completed",
+                description: error.response?.data?.message || "Unknown error occurred.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setLoading(false);
+        }
     }
     
-    const undoCompletionClick = (climb) => {
+    const undoCompletionClick = async (climb) => {
         console.log("Undo Completion Clicked on:", climb.climb_information_id)
-    }
+        setLoading(true);
+        try {
+            const token = localStorage.getItem("token");
+            await axios.delete(`${API_URL}/climbs?climb_information_id=${climb.climb_information_id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            toast({
+                title: "Undo completion successful!",
+                status: "success",
+                duration: 5000,
+                isClosable: true
+            });
+
+            // Removes deleted climb form list of completed climbs
+            setCompletedClimbs((prevClimbs) =>
+                prevClimbs.filter((c) => c.climb_information_id !== climb.climb_information_id)
+            );
+        } catch (error) {
+            console.error("ERROR in undoCompletionClick():", error);
+            toast({
+                title: "Error undoing completion",
+                description: error.response?.data?.message || "Unknown error occurred.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
     
     const fetchAllClimbs = useCallback(async () => {
         setLoading(true);
@@ -108,7 +162,6 @@ const Climbs = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCompletedClimbs(climbs.data);
-            console.log("Completed Climbs:", climbs.data)
         } catch (error) {
             console.error("ERROR in fetchCompletedClimbs():", error);
             toast({

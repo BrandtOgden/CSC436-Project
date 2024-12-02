@@ -3,7 +3,7 @@
 
 Climbify is a full stack social media website made for climbers. You can do things like view posts made by others, interact with friends, view climbs created by others, and keep track of the climbs you have completed. It's built with a MySQL database, a Flask RESTful API, and a React frontend. 
 
-# Getting Started
+# Local Setup
 
 ## Prerequisites
 This project require the following software to be installed:
@@ -15,7 +15,7 @@ To verify installation run:
 node -v
 npm -v
 ```
-You will need the `.env` file in `/flask/app` that's used to manage the connection to the AWS MySQL database and the JWT secret key. If you would like this reach out to Brandt and he can get you a copy.
+You will need the `.env` file in `/flask/app` that holds the MySQL database connection information and the JWT secret key. If you would like this reach out to Brandt and he can get you a copy. We currently have a MySQL database that is hosted on AWS RDS that needs to be up for the app to work. 
 
 ## Dependencies
 To install the Flask dependencies used for this project, from the `flask` directory run `pip install -r requirements.txt`.

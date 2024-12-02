@@ -22,15 +22,20 @@ CREATE VIEW recent_posts AS
 -- Gets all the friends of user
 -- To use this set requested_id to whichever user you want to get friends of
 CREATE VIEW get_friends AS
-    SELECT 
-        u2.username, date_accepted, requested_id
-    FROM
-        friend
-    JOIN
-        c_user u1 ON u1.id = requested_id
-    JOIN
-        c_user u2 ON u2.id = accepted_id
-    ORDER BY friend.date_accepted;
+SELECT
+    u2.id AS friend_id,  -- Include the friend's ID
+    u2.username,         -- Include the friend's username
+    friend.date_accepted,
+    friend.requested_id
+FROM
+    friend
+JOIN
+    c_user u1 ON u1.id = friend.requested_id
+JOIN
+    c_user u2 ON u2.id = friend.accepted_id
+ORDER BY
+    friend.date_accepted;
+
     
 -- Gets all of the climbs that have been completed by a user
 CREATE VIEW get_climbs AS

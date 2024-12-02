@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
     Tabs,
     TabList,
@@ -16,41 +16,6 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import API_URL from "../config"
-
-// FAKE CLIMBS - WILL EVENTUALLY GET FROM BACKEND
-const all_climbs = [
-    {
-      c_name: "Moonlight Arete",
-      grade: "V4",
-      location: "Bishop, CA",
-      c_description: "A beautiful arete climb with amazing views.",
-      id:1
-    },
-    {
-      c_name: "The Buttermilk Stem",
-      grade: "V2",
-      location: "Bishop, CA",
-      c_description: "A classic problem requiring balance and precision.",
-      id:2
-    },
-    {
-      c_name: "The Shield",
-      grade: "V10",
-      location: "Hueco Tanks, TX",
-      c_description: "A powerful climb with technical crimps.",
-      id:3
-    },
-];
-
-const completed_climbs = [
-    {
-        c_name: "The Shield",
-        grade: "V10",
-        location: "Hueco Tanks, TX",
-        c_description: "A powerful climb with technical crimps.",
-        id:3
-    }
-]
 
 // Reusable component for a scrollable box of climbs
 const ClimbList = ({climbs, buttonColor, buttonLabel, onButtonClick}) => {
@@ -105,20 +70,16 @@ const Climbs = () => {
     const [activeTab, setActiveTab] = useState(0);
     const toast = useToast();
 
-    // useEffect(() => {
-    //     const getClimbs = async () =>
-    // }, []);
-
     // ===============================================================================
     const markCompletedClick = (climb) => {
         console.log("Mark as completed clicked on:", climb.id)
     }
     
     const undoCompletionClick = (climb) => {
-        console.log("Undo Completion Clicked on:", climb.id)
+        console.log("Undo Completion Clicked on:", climb.climb_information_id)
     }
     
-    const fetchAllClimbs = async () => {
+    const fetchAllClimbs = useCallback(async () => {
         setLoading(true);
         try {
             // No JWT for this request
@@ -136,9 +97,9 @@ const Climbs = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
     
-    const fetchCompletedClimbs = async () => {
+    const fetchCompletedClimbs = useCallback(async () => {
         setLoading(true);
         try {
             // Now we need JWT
@@ -147,6 +108,7 @@ const Climbs = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCompletedClimbs(climbs.data);
+            console.log("Completed Climbs:", climbs.data)
         } catch (error) {
             console.error("ERROR in fetchCompletedClimbs():", error);
             toast({
@@ -159,7 +121,7 @@ const Climbs = () => {
         } finally {
             setLoading(false);
         }
-    }
+    }, [toast]);
 
     const handleTabChange = async (index) => {
         setActiveTab(index);
@@ -168,14 +130,19 @@ const Climbs = () => {
         if (index === 0) {
             await fetchAllClimbs();
         } else if (index === 1) {
-            console.log("Fetching Completed Climbs")
             await fetchCompletedClimbs();
         } 
-    }
+    } 
 
     useEffect(() => {
-        fetchAllClimbs();
-    }, []);
+        if (activeTab === 0) {
+            fetchAllClimbs();
+        } else if (activeTab === 1) {
+            fetchCompletedClimbs();
+        } else {
+            console.log("ERROR in useEffect() Climbs() - Should never get here")
+        }
+    }, [activeTab, fetchAllClimbs, fetchCompletedClimbs]);
     // ======================================================================================
 
     return (

@@ -168,7 +168,6 @@ def climbs():
         else:
             current_app.logger.info('Getting completed climbs')
             # Getting climbs completed by user
-            print(user_id)
             cursor.execute('SELECT * FROM get_climbs WHERE c_user_id = %s', (user_id,))
             climbs = cursor.fetchall()
 

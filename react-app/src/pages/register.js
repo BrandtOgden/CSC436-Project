@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../config"
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -42,7 +43,7 @@ const Register = () => {
 
     try {
       // API call to register the user
-      const response = await axios.post("http://127.0.0.1:5000/signup", {
+      const response = await axios.post(`${API_URL}/signup`, {
         username,
         password,
         pronouns,
@@ -50,14 +51,19 @@ const Register = () => {
         dob,
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         setSuccess("Registration successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 2000);
       } else {
+        // Here instead of else would need to catch 409 and tell user their username already exists
         setError("Registration failed. Please try again.");
       }
     } catch (err) {
-      setError(err.response?.data?.description || "An error occurred during registration.");
+      if (err.status === 409) {
+        setError("Username already exists!! Pick a different one.")
+      } else {
+        setError(err.response?.data?.description || "An unknown error occurred during registration.");
+      }
     }
   };
 

@@ -48,6 +48,7 @@ CREATE TABLE climb_information (
 CREATE TABLE climbed (
     c_user_id INT,
     climb_information_id INT,
+    date_climbed DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (c_user_id , climb_information_id),
     FOREIGN KEY (c_user_id)
         REFERENCES c_user (id)

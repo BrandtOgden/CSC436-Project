@@ -12,6 +12,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
+import API_URL from "../config"
 
 
 const Login = () => {
@@ -24,7 +25,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/login", {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,7 +42,7 @@ const Login = () => {
       const data = await response.json();
       const token = data.jwt; // Assuming the API returns a JWT
       localStorage.setItem("token", token); // Save token in localStorage or a secure cookie
-      navigate("/"); // Redirect to the homepage or another route
+      navigate("/home");
     } catch (err) {
       setError("An error occurred while logging in. Please try again.");
       console.error("Login error:", err);

@@ -184,14 +184,14 @@ def profile():
     cursor.close()
     abort(500, description="routes.py profile() should never get here")
 
-@routes.route('/climb', methods=['GET', 'POST'])
+@routes.route('/climbs', methods=['GET', 'POST', 'DELETE'])
 @jwt_required(optional=True)
-def climb():
+def climbs():
     """
     Handles climbs based on a user
     'GET': Returns all climbs in the database (JWT not given) or the climbs completed by a user (JWT Given)
-        Returns with 404 error if no climbs were found
     'POST': Says that a user has done a climb, adds the climb to the climbed table
+    'DELETE': Removes the record from the climbed table
     """
     cursor = connect_db().cursor(dictionary=True)
 
@@ -200,41 +200,60 @@ def climb():
 
         climbs = None
         if not user_id:
-            # Getting all climbs
-            cursor.execute('SELECT c_name, c_description, grade, location FROM climb_information')
+            current_app.logger.info('Getting all climbs')
+            cursor.execute('SELECT * FROM climb_information')
             climbs = cursor.fetchall()
         else:
-            # Getting climbs completed by user
-            print(user_id)
+            current_app.logger.info('Getting completed climbs')
             cursor.execute('SELECT * FROM get_climbs WHERE c_user_id = %s', (user_id,))
             climbs = cursor.fetchall()
 
         cursor.close()
-
-        if not climbs:
-            abort(404, description='No climbs found')
         
         return jsonify(climbs)
-    elif request.method == 'POST':
+    else:
         user_id = get_jwt_identity()
 
         if not user_id:
             cursor.close()
-            abort(401, description="JWT is required for POST")
+            abort(401, description="JWT is required for POST/DELETE")
 
-        data = request.get_json()
+        if request.method == 'POST':
+            data = request.get_json()
 
-        if not data or 'climb_information_id' not in data:
+            if not data or 'climb_information_id' not in data:
+                cursor.close()
+                abort(400, description="Request must have `climb_information_id`")
+
+            climb_information_id = data['climb_information_id']
+
+            # Check if this has already been added 
+            cursor.execute('SELECT * FROM climbed WHERE c_user_id = %s AND climb_information_id = %s', (user_id, climb_information_id))
+            response = cursor.fetchall()
+            if response:
+                abort(409, description="Climb already marked as completed")
+
+            cursor.execute('INSERT INTO climbed (c_user_id, climb_information_id) VALUES (%s, %s)', (user_id, climb_information_id))
+            cursor._connection.commit()
             cursor.close()
-            abort(400, description="Request must have `climb_information_id`")
 
-        climb_information_id = data['climb_information_id']
+            return '', 204
+        elif request.method == 'DELETE':
+            # Get climb_information_id from a query parameter 
+            climb_information_id = request.args.get('climb_information_id')
+            print(climb_information_id)
+            if not climb_information_id or climb_information_id == 'undefined':
+                cursor.close()
+                abort(400, description="Request must have `climb_information_id`")
+            
+            # Just going to let it still call the delete even if already deleted
+            print(f"User id: {user_id}")
+            print(f'Climb id: {climb_information_id}')
+            cursor.execute('DELETE FROM climbed WHERE c_user_id = %s AND climb_information_id = %s', (user_id, climb_information_id))
+            cursor._connection.commit()
+            cursor.close()
 
-        cursor.execute('INSERT INTO climbed (c_user_id, climb_information_id) VALUES (%s, %s)', (user_id, climb_information_id))
-        cursor._connection.commit()
+            return '', 204
+
         cursor.close()
-
-        return '', 204
-
-    cursor.close()
-    abort(500, description="routes.py climb() should never get here")
+        abort(500, description="routes.py climb() should never get here")

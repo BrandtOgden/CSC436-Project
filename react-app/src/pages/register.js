@@ -125,12 +125,18 @@ const Register = () => {
             </FormControl>
             <FormControl id="ability" isRequired mt="4">
               <FormLabel>Ability</FormLabel>
-              <Input
-                placeholder="Enter your ability (e.g., climbing, coding)"
-                value={ability}
-                onChange={(e) => setAbility(e.target.value)}
-              />
+              <Select
+                  placeholder="Select your skill level"
+                  value={ability}
+                  onChange={(e) => setAbility(e.target.value)}
+              >
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Expert">Expert</option>
+              </Select>
             </FormControl>
+
             <FormControl id="dob" isRequired mt="4">
               <FormLabel>Date of Birth</FormLabel>
               <Input

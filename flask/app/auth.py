@@ -82,7 +82,7 @@ def login():
     password_hash = db_response['password_hash']
 
     if current_app.bcrypt.check_password_hash(password_hash, password):
-        token = create_access_token(identity=str(user_id))  # Convert user_id to string
+        token = create_access_token(identity=str(user_id),expires_delta=timedelta(hours=1))  # Convert user_id to string
         return jsonify({"jwt": token}), 200
     else:
         abort(401, description="Invalid password")

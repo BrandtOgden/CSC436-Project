@@ -65,7 +65,7 @@ const ClimbList = ({climbs, buttonColor, buttonLabel, onButtonClick}) => {
 
 const Climbs = () => {
     const [allClimbs, setAllClimbs] = useState([]);
-    const [completedClimbs, setCompletedClimbs] = useState([])
+    const [completedClimbs, setCompletedClimbs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState(0);
     const toast = useToast();
@@ -86,7 +86,6 @@ const Climbs = () => {
                 isClosable: true
             });
         } catch (error) {
-            console.error("ERROR in markCompletedClick():", error);
             toast({
                 title: "Error marking climb as completed",
                 description: error.response?.data?.message || "Unknown error occurred.",
@@ -100,7 +99,6 @@ const Climbs = () => {
     }
     
     const undoCompletionClick = async (climb) => {
-        console.log("Undo Completion Clicked on:", climb.climb_information_id)
         setLoading(true);
         try {
             const token = localStorage.getItem("token");
@@ -120,7 +118,6 @@ const Climbs = () => {
                 prevClimbs.filter((c) => c.climb_information_id !== climb.climb_information_id)
             );
         } catch (error) {
-            console.error("ERROR in undoCompletionClick():", error);
             toast({
                 title: "Error undoing completion",
                 description: error.response?.data?.message || "Unknown error occurred.",
@@ -140,7 +137,6 @@ const Climbs = () => {
             const climbs = await axios.get(`${API_URL}/climbs`);
             setAllClimbs(climbs.data);
         } catch (error) {
-            console.error("ERROR in fetchAllClimbs():", error);
             toast({
                 title: "Error fetching climbs",
                 description: error.response?.data?.message || "Unknown error occurred.",
@@ -163,7 +159,6 @@ const Climbs = () => {
             });
             setCompletedClimbs(climbs.data);
         } catch (error) {
-            console.error("ERROR in fetchCompletedClimbs():", error);
             toast({
                 title: "Error fetching completed climbs",
                 description: error.response?.data?.message || "Unknown error occurred.",
@@ -193,7 +188,7 @@ const Climbs = () => {
         } else if (activeTab === 1) {
             fetchCompletedClimbs();
         } else {
-            console.log("ERROR in useEffect() Climbs() - Should never get here")
+            console.log("Should never get here")
         }
     }, [activeTab, fetchAllClimbs, fetchCompletedClimbs]);
     // ======================================================================================
@@ -214,7 +209,9 @@ const Climbs = () => {
                     {/* List of all Climbs */}
                     <TabPanel>
                         {loading ? (
-                            <Spinner size="xl"/>
+                            <Box mt="6" display="flex" justifyContent="center" alignItems="center">
+                                <Spinner size="xl" />
+                            </Box>
                         ) : 
                         <ClimbList climbs={allClimbs} 
                                 buttonColor="blue" 
@@ -225,7 +222,9 @@ const Climbs = () => {
                     {/* List of Completed Climbs */}
                     <TabPanel>
                         {loading ? (
-                            <Spinner size="xl"/>
+                            <Box mt="6" display="flex" justifyContent="center" alignItems="center">
+                                <Spinner size="xl" />
+                            </Box>
                         ) : 
                         <ClimbList climbs={completedClimbs} 
                                 buttonColor="red" 

@@ -137,7 +137,9 @@ const Settings = () => {
           Settings
         </Heading>
         {loading ? (
-          <Spinner size="xl" />
+          <Box mt="6" display="flex" justifyContent="center" alignItems="center">
+            <Spinner size="xl" />
+          </Box>
         ) : editMode ? (
           <Stack spacing={4} align="center">
             <Input

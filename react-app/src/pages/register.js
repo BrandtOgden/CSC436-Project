@@ -11,6 +11,7 @@ import {
   Text,
   useColorModeValue,
   Select,
+  Spinner
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -25,19 +26,23 @@ const Register = () => {
   const [dob, setDob] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     // Basic validation
     if (!username || !password || !confirmPassword || !pronouns || !ability || !dob) {
       setError("All fields are required.");
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      setLoading(false);
       return;
     }
 
@@ -64,6 +69,8 @@ const Register = () => {
       } else {
         setError(err.response?.data?.description || "An unknown error occurred during registration.");
       }
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -132,9 +139,15 @@ const Register = () => {
                 onChange={(e) => setDob(e.target.value)}
               />
             </FormControl>
+            {loading ? (
+              <Box mt="6" display="flex" justifyContent="center" alignItems="center">
+                <Spinner size="xl" />
+              </Box>
+            ) : 
             <Button type="submit" mt="6" colorScheme="blue" width="full">
               Register
             </Button>
+            }
           </form>
           <Text mt="4">
             Already have an account?{" "}

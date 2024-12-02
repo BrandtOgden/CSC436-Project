@@ -45,13 +45,14 @@ def friends():
     'GET': Returns a list of the user's current friends
         Returns 204 if the user doesn't have any friends
     'POST': Adds specified friend by username
-    'DELETE': Deletes specified friend by username
+    'DELETE': Deletes specified friend by friend_id
     """
     user_id = get_jwt_identity()
     cursor = connect_db().cursor(dictionary=True)
 
     if request.method == 'GET':
-        cursor.execute('SELECT username, date_accepted FROM get_friends WHERE requested_id = %s', (user_id,))
+        # Return the user's friends
+        cursor.execute('SELECT friend_id AS id, username, date_accepted FROM get_friends WHERE requested_id = %s', (user_id,))
         friends = cursor.fetchall()
         cursor.close()
 
@@ -60,7 +61,8 @@ def friends():
 
         return jsonify(friends), 200
 
-    elif request.method == 'POST' or request.method == 'DELETE':
+    elif request.method == 'POST':
+        # Add a friend by username
         data = request.get_json()
 
         if not data or 'username' not in data:
@@ -81,31 +83,41 @@ def friends():
 
         friend_id = friend['id']
 
-        if request.method == 'POST':
-            # Check if already friends
-            cursor.execute('SELECT * FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
-            response = cursor.fetchone()
-            if response:
-                cursor.close()
-                abort(409, description="Friend already exists")
-
-            # Add friend relationship
-            cursor.execute('INSERT INTO friend (requested_id, accepted_id) VALUES (%s, %s)', (user_id, friend_id))
-            cursor._connection.commit()
+        # Check if already friends
+        cursor.execute('SELECT * FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
+        response = cursor.fetchone()
+        if response:
             cursor.close()
+            abort(409, description="Friend already exists")
 
-            return jsonify({"success": f"Friend '{username}' added successfully"}), 201
+        # Add friend relationship
+        cursor.execute('INSERT INTO friend (requested_id, accepted_id) VALUES (%s, %s)', (user_id, friend_id))
+        cursor._connection.commit()
+        cursor.close()
 
-        elif request.method == 'DELETE':
-            # Delete friend relationship
-            cursor.execute('DELETE FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
-            cursor._connection.commit()
-            cursor.close()
+        return jsonify({"success": f"Friend '{username}' added successfully"}), 201
 
-            return jsonify({"success": f"Friend '{username}' removed successfully"}), 200
+    elif request.method == 'DELETE':
+        # Remove a friend by friend_id
+        data = request.get_json()
+
+        if not data or 'friend_id' not in data:
+            current_app.logger.error("friend_id is missing from the request payload.")
+            abort(401, description="friend_id required")
+
+        friend_id = data['friend_id']
+        current_app.logger.info(f"Friend ID to delete: {friend_id}")
+
+        # Delete friend relationship
+        cursor.execute('DELETE FROM friend WHERE requested_id = %s AND accepted_id = %s', (user_id, friend_id))
+        cursor._connection.commit()
+        cursor.close()
+
+        return jsonify({"success": f"Friend with ID '{friend_id}' removed successfully"}), 200
 
     cursor.close()
     abort(500, description="routes.py friends() should never get here")
+
 
 
 @routes.route('/current_user', methods=['GET'])

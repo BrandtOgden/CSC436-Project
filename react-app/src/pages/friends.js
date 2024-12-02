@@ -134,7 +134,7 @@ const Friends = () => {
 
 
 
-    const removeFriend = async (friendUsername) => {
+    const removeFriend = async (friendId) => {
         try {
             const response = await fetch("http://127.0.0.1:5000/friends", {
                 method: "DELETE",
@@ -142,7 +142,7 @@ const Friends = () => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
-                body: JSON.stringify({ username: friendUsername }),
+                body: JSON.stringify({ friend_id: friendId }), // Sending friend_id in the payload
             });
 
             if (!response.ok) {
@@ -159,7 +159,7 @@ const Friends = () => {
 
             toast({
                 title: "Success",
-                description: `Friend '${friendUsername}' removed successfully!`,
+                description: `Friend removed successfully!`,
                 status: "success",
                 duration: 3000,
                 isClosable: true,
@@ -177,6 +177,9 @@ const Friends = () => {
             });
         }
     };
+
+
+
 
 
 
@@ -204,7 +207,7 @@ const Friends = () => {
                 <Stack spacing="4">
                     {friends.map((friend) => (
                         <Flex
-                            key={friend.friend_id}
+                            key={friend.id} // Use id as the key
                             align="center"
                             justify="space-between"
                             bg="gray.100"
@@ -221,7 +224,7 @@ const Friends = () => {
                             <Button
                                 colorScheme="red"
                                 size="sm"
-                                onClick={() => removeFriend(friend.username)} // Pass username
+                                onClick={() => removeFriend(friend.id)} // Use friend.id here
                             >
                                 Remove
                             </Button>

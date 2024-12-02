@@ -146,13 +146,12 @@ def profile():
     cursor.close()
     abort(500, description="routes.py profile() should never get here")
 
-@routes.route('/climb', methods=['GET', 'POST'])
+@routes.route('/climbs', methods=['GET', 'POST'])
 @jwt_required(optional=True)
-def climb():
+def climbs():
     """
     Handles climbs based on a user
     'GET': Returns all climbs in the database (JWT not given) or the climbs completed by a user (JWT Given)
-        Returns with 404 error if no climbs were found
     'POST': Says that a user has done a climb, adds the climb to the climbed table
     """
     cursor = connect_db().cursor(dictionary=True)
@@ -163,18 +162,17 @@ def climb():
         climbs = None
         if not user_id:
             # Getting all climbs
-            cursor.execute('SELECT c_name, c_description, grade, location FROM climb_information')
+            current_app.logger.info('Getting all climbs')
+            cursor.execute('SELECT * FROM climb_information')
             climbs = cursor.fetchall()
         else:
+            current_app.logger.info('Getting completed climbs')
             # Getting climbs completed by user
             print(user_id)
             cursor.execute('SELECT * FROM get_climbs WHERE c_user_id = %s', (user_id,))
             climbs = cursor.fetchall()
 
         cursor.close()
-
-        if not climbs:
-            abort(404, description='No climbs found')
         
         return jsonify(climbs)
     elif request.method == 'POST':

@@ -13,51 +13,18 @@ import {
   Flex,
   IconButton,
   Grid,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { FaHeart, FaComment, FaPlusCircle, FaCog } from "react-icons/fa";
+import { FaHeart, FaComment } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { MdForum, MdTerrain, MdGroup, MdSettings, MdArrowBack } from "react-icons/md";
+import { MdTerrain, MdSettings, MdGroup } from "react-icons/md";
 
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false); // For simulating bottom loading
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [opacity, setOpacity] = useState(1);
   const [error, setError] = useState(null);
-
-
-  // Dummy data for the feed
-  const dummyPosts = [
-    {
-      id: 1,
-      title: "Rocky Mountain Adventure",
-      description: "A thrilling climb up the Rockies with a breathtaking view.",
-      picture_url: "https://plus.unsplash.com/premium_photo-1661891527856-3e21f318fa39?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cm9jayUyMGNsaW1iaW5nfGVufDB8fDB8fHww",
-    },
-    {
-      id: 2,
-      title: "Desert Peaks",
-      description: "An unforgettable climb in the desert sands.",
-      picture_url: "https://images.unsplash.com/photo-1621970937306-eb2fd0ed84c9?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-      id: 3,
-      title: "Sunset Climb",
-      description: "Watching the sunset while climbing was magical.",
-      picture_url: "https://images.unsplash.com/photo-1523031399724-41be21913d75?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fGNsaW1iaW5nfGVufDB8fDB8fHww",
-    },
-  ];
 
   useEffect(() => {
     // Fetch posts from the API
@@ -190,19 +157,19 @@ const Home = () => {
                 </Flex>
               </Box>
               <Heading size="md" mb={2}>
-                Your Profile
+                Your Friends
               </Heading>
               <Text fontSize="sm" textAlign="center" mb={4}>
-                Manage your personal details and climbing achievements.
+                View and add your friends. 
               </Text>
               <Button
                 as={Link}
-                to="/home/profile"
+                to="/home/friends"
                 colorScheme="blue"
                 variant="solid"
                 size="sm"
               >
-                View Profile
+                View Friends
               </Button>
             </Flex>
 
@@ -314,9 +281,6 @@ const Home = () => {
         )}
 
       </Box>
-      <Box justifyContent={'center'} width='100px' alignContent={'center'}>      <Spinner position={'center'} size="xl" mt={6} />
-      </Box>
-
     </Box>
   );
 };

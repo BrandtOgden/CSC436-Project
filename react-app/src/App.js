@@ -9,6 +9,7 @@ import Settings from "./pages/settings";
 import Profile from "./pages/profile";
 import Friends from "./pages/friends";
 import Climbs from "./pages/climbs";
+import Home from "./pages/home";
 
 const App = () => {
   return (
@@ -19,7 +20,7 @@ const App = () => {
         <Route path="/register" element={<Register />} />
 
         <Route path="/home" element={<Layout />}>
-          <Route path="view_posts" element={<h1>View Posts</h1>} />
+          <Route path="view_posts" element={<Home />} />
           <Route path="climbs" element={<Climbs />} />
           <Route path="friends" element={<Friends />} />
           <Route path="settings" element={<Settings />} /> 

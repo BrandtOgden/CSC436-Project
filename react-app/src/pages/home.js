@@ -155,7 +155,7 @@ const Home = () => {
               </Text>
               <Button
                 as={Link}
-                to="/climbs"
+                to="/home/climbs"
                 colorScheme="blue"
                 variant="solid"
                 size="sm"
@@ -197,7 +197,7 @@ const Home = () => {
               </Text>
               <Button
                 as={Link}
-                to="/profile"
+                to="/home/profile"
                 colorScheme="blue"
                 variant="solid"
                 size="sm"
@@ -239,7 +239,7 @@ const Home = () => {
               </Text>
               <Button
                 as={Link}
-                to="/settings"
+                to="/home/settings"
                 colorScheme="blue"
                 variant="solid"
                 size="sm"

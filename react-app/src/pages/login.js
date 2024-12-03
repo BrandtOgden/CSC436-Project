@@ -45,7 +45,7 @@ const Login = () => {
       const data = await response.json();
       const token = data.jwt; // Assuming the API returns a JWT
       localStorage.setItem("token", token); // Save token in localStorage or a secure cookie
-      navigate("/home");
+      navigate("/home/view_posts");
     } catch (err) {
       setError("An error occurred while logging in. Please try again.");
       console.error("Login error:", err);

@@ -7,6 +7,9 @@ import {
   VStack,
   HStack,
   Button,
+  Spinner,
+  Alert,
+  AlertIcon,
   Flex,
   IconButton,
   Grid,
@@ -26,8 +29,13 @@ import { MdForum, MdTerrain, MdGroup, MdSettings, MdArrowBack } from "react-icon
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // For simulating bottom loading
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [opacity, setOpacity] = useState(1);
+  const [error, setError] = useState(null);
+
 
   // Dummy data for the feed
   const dummyPosts = [
@@ -52,9 +60,34 @@ const Home = () => {
   ];
 
   useEffect(() => {
-    setTimeout(() => {
-      setPosts(dummyPosts);
-    }, 500);
+    // Fetch posts from the API
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/posts", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        console.log("Posts data:", data); 
+        setPosts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+        
+      }
+    };
+
+    fetchPosts();
+
     const handleScroll = () => {
       const fadeEffect = 1 - window.scrollY / 100; // Adjust the denominator for fade sensitivity
       setOpacity(fadeEffect > 0 ? fadeEffect : 0);
@@ -64,9 +97,6 @@ const Home = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-
-
-
   }, []);
 
   const fadeStyle = {
@@ -224,49 +254,69 @@ const Home = () => {
 
 
 
-        {/* Posts Feed */}
-        <VStack spacing={6} align="stretch">
-          {posts.map((post) => (
-            <Box
-              key={post.id}
-              bg={cardBgColor}
-              rounded="md"
-              shadow="md"
-              p={4}
-              maxWidth="100%"
-            >
-              <Image
-                src={post.picture_url || "https://via.placeholder.com/600"}
-                alt={post.title}
+        {loading ? (
+          <Spinner size="xl" mt={6} />
+        ) : error ? (
+          <Alert status="error" mt={6}>
+            <AlertIcon />
+            {error}
+          </Alert>
+        ) : posts.length === 0 ? (
+          <Text textAlign="center" mt={6}>
+            No posts found.
+          </Text>
+        ) : (
+          <VStack spacing={6} align="stretch">
+            {posts.map((post) => (
+              <Box
+                key={post.post_id}
+                bg={cardBgColor}
                 rounded="md"
-                mb={4}
-              />
-              <Heading as="h3" size="md" mb={2} color={textColor}>
-                {post.title}
-              </Heading>
-              <Text fontSize="sm" mb={4} color="gray.500">
-                {post.description}
-              </Text>
-              <HStack spacing={4}>
-                <IconButton
-                  icon={<FaHeart />}
-                  aria-label="Like post"
-                  colorScheme="red"
-                  size="sm"
+                shadow="md"
+                p={4}
+                maxWidth="100%"
+              >
+                <Image
+                  src={post.image_url || "https://via.placeholder.com/600"}
+                  alt={post.title}
+                  rounded="md"
+                  mb={4}
                 />
-                <IconButton
-                  icon={<FaComment />}
-                  aria-label="Comment on post"
-                  colorScheme="blue"
-                  size="sm"
-                />
-              </HStack>
-            </Box>
-          ))}
-        </VStack>
-
+                <Heading as="h3" size="md" mb={2} color={textColor}>
+                  {post.title}
+                </Heading>
+                <Text fontSize="sm" color="gray.600" mb={2}>
+                  {post.post_description}
+                </Text>
+                <Text fontSize="sm" color="gray.500" mb={2}>
+                  <strong>Author:</strong> {post.created_by}
+                </Text>
+                <Text fontSize="sm" color="gray.500" mb={4}>
+                  <strong>Date:</strong> {new Date(post.date_created).toLocaleString()}
+                </Text>
+                <HStack spacing={4}>
+                  <IconButton
+                    icon={<FaHeart />}
+                    aria-label="Like post"
+                    colorScheme="red"
+                    size="sm"
+                  />
+                  <IconButton
+                    icon={<FaComment />}
+                    aria-label="Comment on post"
+                    colorScheme="blue"
+                    size="sm"
+                  />
+                </HStack>
+              </Box>
+            ))}
+          </VStack>
+        )}
 
       </Box>
+      <Box justifyContent={'center'} width='100px' alignContent={'center'}>      <Spinner position={'center'} size="xl" mt={6} />
+      </Box>
+
     </Box>
   );
 };
